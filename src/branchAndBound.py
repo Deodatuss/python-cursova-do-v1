@@ -216,7 +216,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
             }})
 
     all_entries = []
-    traversed_tree = {}
+    traversed_tree = []
     for key, value in indices.items():
         for i in zip(value, range(len(value))):
             all_entries.append(key+str(i[1]+1))
@@ -268,16 +268,50 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
             key_elems = key.split(",")
 
             BndBCheckAndUpdate(key, fields, level_results)
+        traversed_tree.append(selected_keys_to_traverse)
 
-        traversed_tree.update({i: level_results})
+    traversed_tree.append(level_results)
 
     return traversed_tree
 
 
-def DataDictToTreedictParser(dictionary):
-    tree_compliant_dict = []
+def DataDictToTreedictConverter(dictionary):
+    tree_compliant_arr = []
+    tree_compliant_dict = {-1: "X"}
 
-    return tree_compliant_dict
+    for level in dictionary:
+        for key, value in level.items():
+            tree_compliant_arr.append([key, value["value"]])
+            tree_compliant_dict.update({key+": "+str(value["value"]): "X"})
+
+    # populate root of the tree
+    add_array = []
+    for element, value in dictionary[0].items():
+        add_array.append(element+": "+str(value["value"]))
+    tree_compliant_dict.update({-1: add_array})
+
+    # populate branches
+    for i in range(0, len(dictionary)-1):
+        for row, value in dictionary[i].items():
+            add_array = []
+            for next_row, next_value in dictionary[i+1].items():
+                if row == next_row[:len(row)]:
+                    add_array.append(next_row+": "+str(next_value["value"]))
+            if len(add_array) > 0:
+                tree_compliant_dict.update(
+                    {row+": "+str(value["value"]): add_array})
+
+    max_value = -1
+    max_dict = {}
+    max_dict_key = ""
+    for i, fields in dictionary[-1].items():
+        if fields["value"] > max_value:
+            max_dict = {i: fields}
+            max_value = fields["value"]
+            max_dict_key = i+": "+str(fields["value"])
+
+    tree_compliant_dict[max_dict_key] = "O"
+    return tree_compliant_dict, max_dict
 
 
 def main():
@@ -321,19 +355,12 @@ def main():
         -1: ["A1; 10,2", "A2; 9,8", "A3; 10,0"],
         "A1; 10,2": ["A1-B1; 8,2", "A1-B4; 8,2"],
         "A3; 10,0": ["A3-B1; 8,4", "A3-B3; 8,7"],
+        "A2; 9,8": ["X"],
         "A1-B4; 8,2": ["A1-B4-C1; 7,2", "A1-B4-C2; 7,5", "A1-B4-C3; 7,3"]
     }
-    # utilities.ptree(-1, tree_dict, indent_width=9)
-    print(tree_dict)
-    print("####################")
-    print(tr_tree)
 
-    print("####################")
-    print("####################")
-    print("####################")
-
-    final_tree = DataDictToTreedictParser(tr_tree)
-    print(final_tree)
+    final_tree, max_dict = DataDictToTreedictConverter(tr_tree)
+    utilities.ptree(-1, final_tree, indent_width=9)
 
 
 if __name__ == "__main__":
