@@ -32,29 +32,7 @@ def JSONToNumpy(filename, array_key="array"):
 def CSVToNumpy(filename):
     return np.genfromtxt(filename, delimiter=',')
 
-# numpyArrayOne = np.array([[11, 22, 33], [44, 55, 66], [77, 88, 99]])
 
-# arrayTwo = CSVToNumpy("src/importData.csv")
-
-# print(arrayTwo)
-
-# _ = NumpyToJSON(arrayTwo)
-
-# arrayThree = JSONToArray("results.json")
-
-# print(np.array(arrayThree))
-
-# # Serialization
-# numpyData = {"array": numpyArrayOne}
-# # use dump() to write array into file
-# encodedNumpyData = json.dumps(numpyData, cls=NumpyArrayEncoder)
-# print("Printing JSON serialized NumPy array")
-# print(encodedNumpyData)
-
-# # Deserialization
-# print("Decode JSON serialized NumPy array")
-# decodedArrays = json.loads(encodedNumpyData)
-
-# finalNumpyArray = np.asarray(decodedArrays["array"])
-# print("NumPy Array")
-# print(finalNumpyArray)
+def DictToJSONFile(dictionary, filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(dictionary, f, ensure_ascii=False, indent=4)
