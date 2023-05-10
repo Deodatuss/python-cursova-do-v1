@@ -16,6 +16,8 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
     confident_column_indices = [
         x for x in fixed_column if x in indices[col_bound]]
 
+    # first step – compute pairs from confidend row and column indices
+    # to find which slots in subarray are 100% going to be used
     all_confident = itertools.product(
         confident_row_indices, confident_column_indices)
     confident_slots = [x for x in all_confident if x[0] != x[1]]
@@ -28,7 +30,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
             [(row, x) for x in indices[col_bound]]
         )
 
-    for column in [x for x in fixed_row if x in indices[col_bound]]:
+    for column in [x for x in fixed_column if x in indices[col_bound]]:
         potential_column_slots.append(
             [(x, column) for x in indices[row_bound]]
         )
@@ -39,7 +41,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
     for i in potential_row_slots:
         how_much_from_rows[i[0][0]] = how_much_to_choose[col_bound]
 
-    # number of potential row slots - already closed confident slots
+    # number of potential row slots minus already closed confident slots
     # to prevent giving a row more slots than it can have in theory
     for row in potential_row_slots:
         for i in confident_slots:
@@ -50,7 +52,8 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
     for i in potential_column_slots:
         how_much_from_columns[i[0][1]] = how_much_to_choose[row_bound]
 
-    # same for potential column slots
+    # number of potential column slots minus already closed confident slots
+    # to prevent giving a column more slots than it can have in theory
     for column in potential_column_slots:
         for i in confident_slots:
             if i in column:
@@ -165,6 +168,10 @@ def HighBound(array_data, indices, choose_from_groups):
 
 def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_branch=1, start_level=0):
     def BndBCheckAndUpdate(key, fields, dict_to_update) -> None:
+        """
+        algorithm that forces choosing consecutive elements from different groups,
+        i.e. after first group 'a' second level of a tree should be 'ab' or 'ac' but not 'aa'
+        """
         for element in all_entries:
             # discard already used elements
             if element in key_elems:
@@ -225,6 +232,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
         for i in zip(value, range(len(value))):
             all_entries.append(key+str(i[1]+1))
 
+    # first tree level: finding low bounds for every element
     level_results = {}
     for element in all_entries:
         already_used_in_group = choose_from_groups.copy()
@@ -237,18 +245,20 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
         })
 
     when_stopping_full_search_counter = 0
+
+    # range is a depth of the tree, starting from second tree level
     for i in range(sum(choose_from_groups.values())-1):
         max_unique_keys = []
         selected_keys_to_traverse = {}
 
-        # getting all possible values i.e. full search
+        # setting to continue level with all possible values i.e. full search
         if when_stopping_full_search_counter < start_level:
             max_unique_keys = [x for x in level_results.keys()]
             when_stopping_full_search_counter += 1
             for key in max_unique_keys:
                 selected_keys_to_traverse.update({key: level_results[key]})
 
-        # getting top max_samples_for_branch highest value(s) + all dublicates
+        # setting to continue level with top max_samples_for_branch highest value(s) + all dublicates
         else:
             max_unique_keys = sorted(
                 level_results, key=lambda x: level_results[x]["value"]
