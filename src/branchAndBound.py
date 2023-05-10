@@ -6,12 +6,13 @@ import numpy as np
 import math
 
 
-def ChosenFromSubtable(array_data, subarray_slice, fixed_row: list, fixed_column: list, indices: dict, how_much_to_choose: dict, row_bound: str, col_bound: str):
+def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: list, indices: dict, how_much_to_choose: dict, row_bound: str, col_bound: str):
     chosen_triple_tuples = []
     upper_shift = indices[row_bound][0]
     right_shift = indices[col_bound][0]
 
-    confident_row_indices = [x for x in fixed_row if x in indices[row_bound]]
+    confident_row_indices = [
+        x for x in fixed_row if x in indices[row_bound]]
     confident_column_indices = [
         x for x in fixed_column if x in indices[col_bound]]
 
@@ -131,22 +132,25 @@ def ChosenElementsToFixedParser(elements_string: str, group_indices: dict):
 
 
 def BoundFromString(array_data, indices, choose_from_groups, element_string: str):
-    ab_subtable = np.s_[indices["a"][0]:indices["a"][-1]+1,
+    """
+    Uses ComputeLowBound algorithm on ab, ac and bc subarrays to find whole array's low bound
+    """
+    ab_subarray = np.s_[indices["a"][0]:indices["a"][-1]+1,
                         indices["b"][0]:indices["b"][-1]+1]
-    ac_subtable = np.s_[indices["a"][0]:indices["a"][-1]+1,
+    ac_subarray = np.s_[indices["a"][0]:indices["a"][-1]+1,
                         indices["c"][0]:indices["c"][-1]+1]
-    bc_subtable = np.s_[indices["b"][0]:indices["b"][-1]+1,
+    bc_subarray = np.s_[indices["b"][0]:indices["b"][-1]+1,
                         indices["c"][0]:indices["c"][-1]+1]
 
     fixed_row, fixed_column = ChosenElementsToFixedParser(
         element_string, indices)
 
-    ab_list = ChosenFromSubtable(array_data, ab_subtable, fixed_row,
-                                 fixed_column, indices, choose_from_groups, "a", "b")
-    ac_list = ChosenFromSubtable(array_data, ac_subtable, fixed_row,
-                                 fixed_column, indices, choose_from_groups, "a", "c")
-    bc_list = ChosenFromSubtable(array_data, bc_subtable, fixed_row,
-                                 fixed_column, indices, choose_from_groups, "b", "c")
+    ab_list = ComputeLowBound(array_data, ab_subarray, fixed_row,
+                              fixed_column, indices, choose_from_groups, "a", "b")
+    ac_list = ComputeLowBound(array_data, ac_subarray, fixed_row,
+                              fixed_column, indices, choose_from_groups, "a", "c")
+    bc_list = ComputeLowBound(array_data, bc_subarray, fixed_row,
+                              fixed_column, indices, choose_from_groups, "b", "c")
 
     sum = 0
     for i in ab_list+ac_list+bc_list:
@@ -276,6 +280,9 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
 
 
 def DataDictToTreedictConverter(dictionary):
+    """
+    Reformats BranchAndBound dictionary into other dictionary used to build a tree
+    """
     tree_compliant_arr = []
     tree_compliant_dict = {-1: "X"}
 
