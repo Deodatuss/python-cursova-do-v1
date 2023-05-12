@@ -55,6 +55,24 @@ def GetGroupIndices(data):
     return group_indices
 
 
+def PartialValueToFull(partial_value: float, choose_from_groups) -> float:
+    full_value = (partial_value*2) + (
+        choose_from_groups['a']**2 +
+        choose_from_groups['b']**2 +
+        choose_from_groups['c']**2)
+
+    return full_value
+
+
+def FullValueToPartial(full_value: float, choose_from_groups) -> float:
+    partial_value = ((full_value -
+                      choose_from_groups['a']**2 -
+                      choose_from_groups['b']**2 -
+                      choose_from_groups['c']**2)/2)
+
+    return partial_value
+
+
 def ptree(start, tree, indent_width=4):
     """
     https://stackoverflow.com/questions/51903172/how-to-display-a-tree-in-python-similar-to-msdos-tree-command
