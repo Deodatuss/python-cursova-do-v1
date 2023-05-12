@@ -20,27 +20,7 @@ def main():
     }
 
     data = converters.JSONToNumpy(input_relative_filename)
-    groups_info = utilities.GetGroupsSize(data)
-
-    # indices of elements from each group
-    # e.g. [0, 1], [2, 3], [4, 5] if array of 6 elements was divided in 3 groups by 2
-    a = [groups_info["a"]["size"], groups_info["b"]
-         ["size"], groups_info["c"]["size"]]
-
-    group_A = [x for x in range(a[0])]
-    group_B = [x for x in range(a[0], a[0]+a[1])]
-    group_C = [x for x in range(a[0]+a[1], a[0]+a[1]+a[2])]
-
-    group_indices = {
-        "a": group_A,
-        "b": group_B,
-        "c": group_C
-    }
-
-    # group_indices looks like this:
-    # group_indices = {
-    #     'a': [0, 1, 2, 3, 4, 5], 'b': [6, 7, 8, 9, 10], 'c': [11, 12, 13, 14]
-    # }
+    group_indices = utilities.GetGroupIndices(data)
 
     high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
 

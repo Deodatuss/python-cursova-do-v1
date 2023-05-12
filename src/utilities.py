@@ -29,6 +29,32 @@ def GetGroupsSize(numpy_array):
     return result
 
 
+def GetGroupIndices(data):
+    group_size = GetGroupsSize(data)
+    """
+    return group_indices in such format and keys:
+    group_indices = {
+        'a': [0, 1, 2, 3, 4, 5], 'b': [6, 7, 8, 9, 10], 'c': [11, 12, 13, 14]
+    }
+    """
+    # indices of elements from each group
+    # e.g. [0, 1], [2, 3], [4, 5] if array of 6 elements was divided in 3 groups by 2
+    a = [group_size["a"]["size"], group_size["b"]
+         ["size"], group_size["c"]["size"]]
+
+    group_a = [x for x in range(a[0])]
+    group_b = [x for x in range(a[0], a[0]+a[1])]
+    group_c = [x for x in range(a[0]+a[1], a[0]+a[1]+a[2])]
+
+    group_indices = {
+        "a": group_a,
+        "b": group_b,
+        "c": group_c
+    }
+
+    return group_indices
+
+
 def ptree(start, tree, indent_width=4):
     """
     https://stackoverflow.com/questions/51903172/how-to-display-a-tree-in-python-similar-to-msdos-tree-command
