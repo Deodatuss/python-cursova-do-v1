@@ -120,6 +120,16 @@ def UniqueThreeMax(array_data, indices, choose_from_groups):
             tuple(third_max_element_position)]
 
 
+def InternalGroupCheck(indices_tuple, indices):
+    if indices['a'][0] <= indices_tuple[0] <= indices['a'][-1] and indices['a'][0] <= indices_tuple[1] <= indices['a'][-1]:
+        return True
+    if indices['b'][0] <= indices_tuple[0] <= indices['b'][-1] and indices['b'][0] <= indices_tuple[1] <= indices['b'][-1]:
+        return True
+    if indices['c'][0] <= indices_tuple[0] <= indices['c'][-1] and indices['c'][0] <= indices_tuple[1] <= indices['c'][-1]:
+        return True
+    return False
+
+
 def GreedyValue(array_data, indices, choose_from_groups):
     three_unique_max = UniqueThreeMax(array_data, indices, choose_from_groups)
 
@@ -127,15 +137,13 @@ def GreedyValue(array_data, indices, choose_from_groups):
 
     all_indices = sorted(all_indices)
 
-    all_elements = list(itertools.product(all_indices, repeat=2))
+    all_elements = list(itertools.combinations(all_indices, 2))
 
-    full_greedy_value = 0
+    partial_greedy_value = 0
 
     for el in all_elements:
         i = array_data[el]
-        full_greedy_value += i
-
-    partial_greedy_value = utilities.FullValueToPartial(
-        full_greedy_value, choose_from_groups)
+        if not InternalGroupCheck(el, indices):
+            partial_greedy_value += i
 
     return partial_greedy_value
