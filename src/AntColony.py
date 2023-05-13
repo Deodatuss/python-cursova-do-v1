@@ -2,22 +2,30 @@ import numpy as np
 import converters
 import utilities
 import GreedyAlgorithm
+import branchAndBound
 
 
-def AllPossibleStates(element_array, pheromone_array, element_influence, pheromone_influence):
-    all_states_sum = 0
-    for pair in zip(element_array, pheromone_array):
-        all_states_sum += (pair[0]**element_influence) * \
-            (pair[1]**pheromone_influence)
+def ProbabilityOfAllPaths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
+    data_times_pheromone = {}
+    sum_probability = 0
+    for path, position in paths.items():
+        probability = MoveSimpleProbability(
+            array_data[position], array_pheromone[position], influence_data, influence_pheromone)
+        data_times_pheromone.update({path: probability})
+        sum_probability += probability
 
-    return all_states_sum
+    edge_selection_probability = []
+    paths = []
+    for path, probability in data_times_pheromone.items():
+        edge_selection_probability.append(probability/sum_probability)
+        paths.append(path)
+
+    return edge_selection_probability, paths
 
 
-def ProbabilityOfMovingToState(element_value, pheromone_value, element_influence, pheromone_influence, all_states):
-    p = ((element_value**element_influence) *
-         (pheromone_value**pheromone_influence))/all_states
-
-    return p
+def MoveSimpleProbability(value_data, value_pheromone, influence_data, influence_pheromone):
+    return (value_data**influence_data) * \
+        (value_pheromone**influence_pheromone)
 
 
 def IndexFromString(position, indices):
@@ -25,16 +33,16 @@ def IndexFromString(position, indices):
     local_position = int(position[1])
     for key in indices.keys():
         if group == key:
-            a = indices[key]
+            return indices[key][local_position-1]
 
 
-def MoveValue(array_data, indices, new_ant):
-    path = list(new_ant.keys())[0]
-    new_move = path[-(2 % len(path))]
-    current_pos = path[-(2 % len(path))]
+def MoveIndex(indices, new_path):
+    new_move = new_path[-(2 % len(new_path)):]
+    current_pos = new_path[-(5 % len(new_path)):-(5 % len(new_path))+2]
 
     y = IndexFromString(new_move, indices)
     x = IndexFromString(current_pos, indices)
+    return (y, x)
 
 
 def PossibleNewPathsForAnt(ant, all_entries):
@@ -53,8 +61,6 @@ def PossibleNewPathsForAnt(ant, all_entries):
         # discard using empty groups
         if already_used_in_group[element[0]] == 0:
             continue
-
-        possible_new_ant = path+","+element
 
         big_loop_violation = False
         small_loop_violation = False
@@ -86,16 +92,25 @@ def PossibleNewPathsForAnt(ant, all_entries):
         if (small_loop_violation and small_loop_can_be_made):
             continue
 
-        possible_paths.append(element)
+        possible_new_ant = path+","+element
+        possible_paths.append(possible_new_ant)
 
     return possible_paths
 
 
-def ChooseNextPath(array_data, indices, array_pheromone, all_entries, ant):
-    possible_moves = PossibleNewPathsForAnt(ant, all_entries)
+def PossibleNextMoveIndex(array_data, indices, array_pheromone, all_entries, ant):
+    possible_paths = PossibleNewPathsForAnt(ant, all_entries)
+    path_indices_to_new_element = {}
+    for path in possible_paths:
+        index = MoveIndex(indices, path)
+        path_indices_to_new_element.update({path: index})
+    return path_indices_to_new_element
 
 
-def AntIteration(array_data, indices, choose_from_groups, array_pheromone, ants_per_element=1):
+def AntIteration(array_data, indices, choose_from_groups, array_pheromone,
+                 ants_per_element, influence_data, influence_pheromone):
+    return_array_of_dict = []
+
     all_entries = []
     for key, value in indices.items():
         for i in range(len(value)):
@@ -109,15 +124,131 @@ def AntIteration(array_data, indices, choose_from_groups, array_pheromone, ants_
 
         for ant in range(ants_per_element):
             ants.append({element: {
-                "path_value": 0,
+                "value": 0,
                 "in_groups_left": already_used_in_group
             }})
 
-    # second layer
-    current_ant = ants[0]
-    ChooseNextPath(array_data, indices, array_pheromone, all_entries, ants[0])
-    PossibleNewPathsForAnt(ants[0], all_entries)
-    # for i in range(sum(choose_from_groups.values())-1):
+    temp_dict = {}
+    for ant in ants:
+        temp_dict.update(ant)
+    return_array_of_dict.append(temp_dict)
+
+    for layer in range(sum(choose_from_groups.values())-1):
+        ant_iterator = 0
+        for ant in ants:
+            paths_and_indices = PossibleNextMoveIndex(array_data, indices, array_pheromone,
+                                                      all_entries, ant)
+            probabilities, paths_only = ProbabilityOfAllPaths(
+                array_data, array_pheromone, influence_data, influence_pheromone, paths_and_indices)
+
+            # probabilities = [0.92, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+
+            random_number = np.random.rand(1)
+            chosen_path_index = 0
+            sum_of_probabilites = 0
+            for prob in zip(probabilities, range(len(probabilities))):
+                sum_of_probabilites += prob[0]
+                if sum_of_probabilites > random_number:
+                    chosen_path_index = prob[1]
+                    break
+
+            new_ant_path = paths_only[chosen_path_index]
+            added_value = array_data[MoveIndex(indices, new_ant_path)]
+
+            for key, values in ant.items():
+                new_groups_left = values["in_groups_left"].copy()
+                new_groups_left[new_ant_path[-2]] -= 1
+                new_ant = {new_ant_path: {
+                    "value": values['value']+added_value,
+                    "in_groups_left": new_groups_left
+                }}
+                ants[ant_iterator] = new_ant
+
+            ant_iterator += 1
+        temp_dict = {}
+        for ant in ants:
+            temp_dict.update(ant)
+        return_array_of_dict.append(temp_dict)
+
+    return return_array_of_dict
+
+
+def DataDictToPreferablePathsTreeDict(dictionary):
+    """
+    Reformats BranchAndBound dictionary into other dictionary used to build a tree
+    """
+    tree_compliant_arr = []
+    tree_compliant_dict = {-1: "X"}
+
+    for level in dictionary:
+        for key, value in level.items():
+            tree_compliant_arr.append([key, value["value"]])
+            tree_compliant_dict.update({key+": "+str(value["value"]): "X"})
+
+    # populate root of the tree
+    add_array = []
+    for element, value in dictionary[0].items():
+        add_array.append(element+": "+str(value["value"]))
+    tree_compliant_dict.update({-1: add_array})
+
+    # populate branches
+    for i in range(0, len(dictionary)-1):
+        for row, value in dictionary[i].items():
+            add_array = []
+            for next_row, next_value in dictionary[i+1].items():
+                if row == next_row[:len(row)]:
+                    add_array.append(next_row+": "+str(next_value["value"]))
+            if len(add_array) > 0:
+                tree_compliant_dict.update(
+                    {row+": "+str(value["value"]): add_array})
+
+    max_value = -1
+    max_dict = {}
+    max_dict_key = ""
+    for i, fields in dictionary[-1].items():
+        if fields["value"] > max_value:
+            max_dict = {i: fields}
+            max_value = fields["value"]
+            max_dict_key = i+": "+str(fields["value"])
+
+    tree_compliant_dict[max_dict_key] = "O"
+    return tree_compliant_dict, max_dict
+
+
+def TraversedEdgesFromString(indices, element_string):
+    vertices = element_string.split(",")
+    TraversedEdgesFromString = []
+    for index_tuple in zip(range(0, len(vertices)-1), range(1, len(vertices))):
+        x_position = IndexFromString(vertices[index_tuple[0]], indices)
+        y_position = IndexFromString(vertices[index_tuple[1]], indices)
+
+        TraversedEdgesFromString.append((x_position, y_position))
+    return TraversedEdgesFromString
+
+
+def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromone, ant_paths, evaporation_coef):
+    full_paths = ant_paths[-1]
+    values = []
+    sum_values = 0
+
+    # negative feedback on pheromones
+    array_pheromone *= (1-evaporation_coef)
+
+    # get values which shows how lucrative every path is
+    for key in full_paths.keys():
+        ant_value = branchAndBound.BoundFromString(
+            array_data, indices, choose_from_groups, key)
+        values.append(ant_value)
+        sum_values += ant_value
+        a = TraversedEdgesFromString(indices, key)
+
+    # positive feedback on pheromones
+    for key_and_value in zip(full_paths.keys(), values):
+        edges = TraversedEdgesFromString(indices, key_and_value[0])
+        for edge in edges:
+            array_pheromone[edge] += key_and_value[1]/sum_values
+            # change mirrored element too
+            array_pheromone[edge[1], edge[0]] += key_and_value[1]/sum_values
 
 
 def main():
@@ -135,6 +266,11 @@ def main():
     how_much_to_choose = {
         'a': 1, 'b': 3, 'c': 2
     }
+    number_of_iterations = 10
+    ants_per_edge = 2
+    influence_data = 0.5
+    influence_pheromone = 0.9
+    evaporation_coef = 0.1
 
     data = converters.JSONToNumpy(input_relative_filename)
     group_indices = utilities.GetGroupIndices(data)
@@ -142,7 +278,41 @@ def main():
 
     GreedyAlgorithm.GreedyValue(data, group_indices, how_much_to_choose)
 
-    AntIteration(data, group_indices, how_much_to_choose, pheromone, 2)
+    np.random.seed(0)
+    ants_paths = AntIteration(
+        data, group_indices, how_much_to_choose, pheromone, 2)
+
+    UpdatePheromoneArray(data, group_indices,
+                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
+
+    # nicer-looking array
+    # print(pheromone.round(decimals=3))
+
+    ants_paths = AntIteration(
+        data, group_indices, how_much_to_choose, pheromone, 2)
+
+    UpdatePheromoneArray(data, group_indices,
+                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
+
+    ants_paths = AntIteration(
+        data, group_indices, how_much_to_choose, pheromone, 2)
+
+    UpdatePheromoneArray(data, group_indices,
+                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
+
+    ants_paths = AntIteration(
+        data, group_indices, how_much_to_choose, pheromone, 2)
+
+    UpdatePheromoneArray(data, group_indices,
+                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
+
+    print(pheromone.round(decimals=3))
+
+    ants_tree_dict, _ = branchAndBound.DataDictToTreedictConverter(ants_paths)
+
+    utilities.ptree(-1, ants_tree_dict)
+
+    i = 0
 
 
 if __name__ == "__main__":
