@@ -1,8 +1,5 @@
 import numpy as np
-import converters
-import utilities
-import GreedyAlgorithm
-import branchAndBound
+from branchAndBound import BoundFromString
 
 
 def ProbabilityOfAllPaths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
@@ -229,91 +226,52 @@ def TraversedEdgesFromString(indices, element_string):
 def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromone, ant_paths, evaporation_coef):
     full_paths = ant_paths[-1]
     values = []
-    sum_values = 0
+    max_value = 0
 
     # negative feedback on pheromones
     array_pheromone *= (1-evaporation_coef)
 
     # get values which shows how lucrative every path is
     for key in full_paths.keys():
-        ant_value = branchAndBound.BoundFromString(
+        ant_value = BoundFromString(
             array_data, indices, choose_from_groups, key)
         values.append(ant_value)
-        sum_values += ant_value
-        a = TraversedEdgesFromString(indices, key)
+        if ant_value > max_value:
+            max_value = ant_value
 
     # positive feedback on pheromones
     for key_and_value in zip(full_paths.keys(), values):
         edges = TraversedEdgesFromString(indices, key_and_value[0])
         for edge in edges:
-            array_pheromone[edge] += key_and_value[1]/sum_values
+            array_pheromone[edge] += key_and_value[1]/max_value
             # change mirrored element too
-            array_pheromone[edge[1], edge[0]] += key_and_value[1]/sum_values
+            array_pheromone[edge[1], edge[0]] += key_and_value[1]/max_value
 
 
-def main():
-    """
-    This function is used as a test and presentation for Ant Colony Algorithm functions and workflow
-    """
-    input_folder = "data/demo/"
-    output_folder = "data/demo/"
+def AddEdgeTraversesToStrings(ants_paths, traversed_edges, indices):
+    elements_plus_edges = [ants_paths[0]]
+    for level in ants_paths[1:]:
+        elements_plus_edges.append({})
+        for key, values in level.items():
+            elements = key.split(",")
+            el_indices = [IndexFromString(x, indices) for x in elements]
+            new_string = ""
+            for i in range(len(elements)-1):
+                new_string += elements[i]
+                new_string += '-'
 
-    input_relative_filename = input_folder + "input.json"
-    dict_output_relative_filename = output_folder + "dict_output.json"
-    tree_output_relative_filename = output_folder + "tree_output.txt"
+                ind_tuple = (el_indices[i], el_indices[i+1])
+                rever_tuple = (el_indices[i+1], el_indices[i])
 
-    # number of elements from each of three groups
-    how_much_to_choose = {
-        'a': 1, 'b': 3, 'c': 2
-    }
-    number_of_iterations = 10
-    ants_per_edge = 2
-    influence_data = 0.5
-    influence_pheromone = 0.9
-    evaporation_coef = 0.1
+                pos_value = traversed_edges.get(ind_tuple)
+                pos_rever_value = traversed_edges.get(rever_tuple)
 
-    data = converters.JSONToNumpy(input_relative_filename)
-    group_indices = utilities.GetGroupIndices(data)
-    pheromone = np.ones(data.shape)
+                if pos_value:
+                    new_string += str(pos_value)
+                else:
+                    new_string += str(pos_rever_value)
+                new_string += '-'
 
-    GreedyAlgorithm.GreedyValue(data, group_indices, how_much_to_choose)
-
-    np.random.seed(0)
-    ants_paths = AntIteration(
-        data, group_indices, how_much_to_choose, pheromone, 2)
-
-    UpdatePheromoneArray(data, group_indices,
-                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
-
-    # nicer-looking array
-    # print(pheromone.round(decimals=3))
-
-    ants_paths = AntIteration(
-        data, group_indices, how_much_to_choose, pheromone, 2)
-
-    UpdatePheromoneArray(data, group_indices,
-                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
-
-    ants_paths = AntIteration(
-        data, group_indices, how_much_to_choose, pheromone, 2)
-
-    UpdatePheromoneArray(data, group_indices,
-                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
-
-    ants_paths = AntIteration(
-        data, group_indices, how_much_to_choose, pheromone, 2)
-
-    UpdatePheromoneArray(data, group_indices,
-                         how_much_to_choose, pheromone, ants_paths, evaporation_coef)
-
-    print(pheromone.round(decimals=3))
-
-    ants_tree_dict, _ = branchAndBound.DataDictToTreedictConverter(ants_paths)
-
-    utilities.ptree(-1, ants_tree_dict)
-
-    i = 0
-
-
-if __name__ == "__main__":
-    main()
+            new_string += elements[-1]
+            elements_plus_edges[-1].update({new_string: values})
+    return elements_plus_edges
