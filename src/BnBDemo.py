@@ -10,7 +10,7 @@ def main():
     This function is used as a test and presentation for BnB functions and workflow
     """
     folder = "data/demo/"
-    input_relative_filename = folder + "input.json"
+    input_relative_filename = folder + "importData.csv"
     dict_output_relative_filename = folder + "dict_output.json"
     tree_output_relative_filename = folder + "tree_output.txt"
 
@@ -19,7 +19,7 @@ def main():
         'a': 1, 'b': 3, 'c': 2
     }
 
-    data = converters.JSONToNumpy(input_relative_filename)
+    data = converters.CSVToNumpy(input_relative_filename)
     group_indices = utilities.GetGroupIndices(data)
 
     high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
