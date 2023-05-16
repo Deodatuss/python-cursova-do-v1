@@ -1,3 +1,5 @@
+import os
+
 import branchAndBound as bnb
 import converters
 import utilities
@@ -9,10 +11,10 @@ def main():
     """
     This function is used as a test and presentation for BnB functions and workflow
     """
-    folder = "data/demo/"
-    input_relative_filename = folder + "importData.csv"
-    dict_output_relative_filename = folder + "dict_output.json"
-    tree_output_relative_filename = folder + "tree_output.txt"
+    root_folder = os.path.dirname(os.path.abspath(__file__))
+    input_relative_filename = os.path.join(root_folder, '..', 'data', 'demo', "importData.csv")
+    dict_output_relative_filename = os.path.join(root_folder, '..', 'data', 'demo', "dict_output.json")
+    tree_output_relative_filename = os.path.join(root_folder, '..', 'data', 'demo', "tree_output.txt")
 
     # number of elements from each of three groups
     how_much_to_choose = {
