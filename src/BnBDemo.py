@@ -1,3 +1,7 @@
+import getopt
+import os
+import sys
+
 import branchAndBound as bnb
 import converters
 import utilities
@@ -9,15 +13,45 @@ def main():
     """
     This function is used as a test and presentation for BnB functions and workflow
     """
-    folder = "data/demo/"
-    input_relative_filename = folder + "importData.csv"
-    dict_output_relative_filename = folder + "dict_output.json"
-    tree_output_relative_filename = folder + "tree_output.txt"
-
+    root_folder = os.path.dirname(os.path.abspath(__file__))
+    input_file = os.path.join(root_folder, '..', 'data', 'demo', "importData.csv")
+    output_path = os.path.join(root_folder, '..', 'data', 'demo')
     # number of elements from each of three groups
     how_much_to_choose = {
         'a': 1, 'b': 3, 'c': 2
     }
+    max_samples_for_branch = 1
+    start_level = 0
+
+    opts, args = getopt.getopt(sys.argv, "hi:o:a:b:c:msb:sl:",
+                               ["input_file=",
+                                "output_path=",
+                                "a=", "b=", "c=",
+                                "max_samples_for_branch=",
+                                "start_level="])
+    for opt, arg in opts:
+        if opt == '-h':
+            print('python BnBDemo.py -i <inputfile.csv> -o <outputpath> -a <num to pick from a> -b <num to pick from b> -c <num to pick from c> -msb <max samples for branch> -sl <start level>')
+            sys.exit()
+        elif opt in ("-i", "input_file="):
+            input_file = arg
+        elif opt in ("-o", "output_path="):
+            output_path = arg
+        elif opt in ("-a", "a="):
+            how_much_to_choose["a"] = arg
+        elif opt in ("-b", "b="):
+            how_much_to_choose["b"] = arg
+        elif opt in ("-c", "c="):
+            how_much_to_choose["c"] = arg
+        elif opt in ("-msb", "max_samples_for_branch="):
+            max_samples_for_branch = arg
+        elif opt in ("-sl", "start_level="):
+            start_level = arg
+
+    root_folder = os.path.dirname(os.path.abspath(__file__))
+    input_relative_filename = input_file
+    dict_output_relative_filename = os.path.join(output_path, "dict_output.json")
+    tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
 
     data = converters.CSVToNumpy(input_relative_filename)
     group_indices = utilities.GetGroupIndices(data)
@@ -25,7 +59,11 @@ def main():
     high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
 
     tr_tree = bnb.BranchAndBound(
-        data, group_indices, how_much_to_choose, max_samples_for_branch=1, start_level=0)
+        data,
+        group_indices,
+        how_much_to_choose,
+        max_samples_for_branch,
+        start_level)
 
     dict_for_json = {}
 
@@ -51,6 +89,7 @@ def main():
         with redirect_stdout(f):
             utilities.ptree(-1, final_tree, indent_width=9)
 
+    print('Done. Find output files in ' + output_path)
 
 if __name__ == "__main__":
     main()
