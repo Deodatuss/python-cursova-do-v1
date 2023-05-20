@@ -48,12 +48,10 @@ def main():
         elif opt in ("-sl", "start_level="):
             start_level = arg
 
-    root_folder = os.path.dirname(os.path.abspath(__file__))
-    input_relative_filename = input_file
     dict_output_relative_filename = os.path.join(output_path, "dict_output.json")
     tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
 
-    data = converters.CSVToNumpy(input_relative_filename)
+    data = converters.CSVToNumpy(input_file)
     group_indices = utilities.GetGroupIndices(data)
 
     high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
