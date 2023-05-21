@@ -2,7 +2,15 @@ import itertools
 import numpy as np
 
 
-def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: list, indices: dict, how_much_to_choose: dict, row_bound: str, col_bound: str):
+def compute_low_bound(
+        array_data,
+        subarray_slice,
+        fixed_row: list,
+        fixed_column: list,
+        indices: dict,
+        how_much_to_choose: dict,
+        row_bound: str,
+        col_bound: str):
     chosen_triple_tuples = []
     upper_shift = indices[row_bound][0]
     right_shift = indices[col_bound][0]
@@ -12,7 +20,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
     confident_column_indices = [
         x for x in fixed_column if x in indices[col_bound]]
 
-    # first step – compute pairs from confidend row and column indices
+    # first step – compute pairs from confident row and column indices
     # to find which slots in subarray are 100% going to be used
     all_confident = itertools.product(
         confident_row_indices, confident_column_indices)
@@ -69,7 +77,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
         for i in zip(potential_row_with_values, range(how_much_from_rows[row[0][0]])):
             chosen_triple_tuples.append(i[0])
 
-    # possibly BUG PRONE (e.g. adding more then some row can handle)
+    # possibly BUG PRONE (e.g. adding more than some row can handle)
     # do the same for columns
     for column in potential_column_slots:
         potential_column_with_values = [
@@ -79,7 +87,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
         for i in zip(potential_column_with_values, range(how_much_from_columns[column[0][1]])):
             chosen_triple_tuples.append(i[0])
 
-    # lastly, if less then needed to choose, find left max slots from subblock
+    # lastly, if less than needed to choose, find left max slots from subblock
     left_to_choose = (how_much_to_choose[row_bound] *
                       how_much_to_choose[col_bound]) - len(chosen_triple_tuples)
 
@@ -104,7 +112,7 @@ def ComputeLowBound(array_data, subarray_slice, fixed_row: list, fixed_column: l
     return chosen_triple_tuples
 
 
-def ChosenElementsToFixedParser(elements_string: str, group_indices: dict):
+def chosen_elements_to_fixed_parser(elements_string: str, group_indices: dict):
     """ 
     Parsing string from format like "a1,b2,c3,a5,b1,b3" into fixed rows and columns 
     attached to corresponding elements. 
@@ -130,7 +138,7 @@ def ChosenElementsToFixedParser(elements_string: str, group_indices: dict):
     return fixed_row, fixed_column
 
 
-def BoundFromString(array_data, indices, choose_from_groups, element_string: str):
+def bound_from_string(array_data, indices, choose_from_groups, element_string: str):
     """
     Uses ComputeLowBound algorithm on ab, ac and bc subarrays to find whole array's low bound
     """
@@ -141,15 +149,15 @@ def BoundFromString(array_data, indices, choose_from_groups, element_string: str
     bc_subarray = np.s_[indices["b"][0]:indices["b"][-1]+1,
                         indices["c"][0]:indices["c"][-1]+1]
 
-    fixed_row, fixed_column = ChosenElementsToFixedParser(
+    fixed_row, fixed_column = chosen_elements_to_fixed_parser(
         element_string, indices)
 
-    ab_list = ComputeLowBound(array_data, ab_subarray, fixed_row,
-                              fixed_column, indices, choose_from_groups, "a", "b")
-    ac_list = ComputeLowBound(array_data, ac_subarray, fixed_row,
-                              fixed_column, indices, choose_from_groups, "a", "c")
-    bc_list = ComputeLowBound(array_data, bc_subarray, fixed_row,
-                              fixed_column, indices, choose_from_groups, "b", "c")
+    ab_list = compute_low_bound(array_data, ab_subarray, fixed_row,
+                                fixed_column, indices, choose_from_groups, "a", "b")
+    ac_list = compute_low_bound(array_data, ac_subarray, fixed_row,
+                                fixed_column, indices, choose_from_groups, "a", "c")
+    bc_list = compute_low_bound(array_data, bc_subarray, fixed_row,
+                                fixed_column, indices, choose_from_groups, "b", "c")
 
     sum = 0
     for i in ab_list+ac_list+bc_list:
@@ -158,12 +166,12 @@ def BoundFromString(array_data, indices, choose_from_groups, element_string: str
     return sum
 
 
-def HighBound(array_data, indices, choose_from_groups):
-    return BoundFromString(array_data, indices, choose_from_groups, "")
+def high_bound(array_data, indices, choose_from_groups):
+    return bound_from_string(array_data, indices, choose_from_groups, "")
 
 
-def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_branch=1, start_level=0):
-    def BndBCheckAndUpdate(key, fields, dict_to_update) -> None:
+def branch_and_bound(array_data, indices, choose_from_groups, max_samples_for_branch=1, start_level=0):
+    def bnb_check_and_update(key, fields, dict_to_update) -> None:
         """
         algorithm that forces choosing consecutive elements from different groups,
         i.e. after first group 'a' second level of a tree should be 'ab' or 'ac' but not 'aa'
@@ -217,7 +225,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
             # sorted_new = ','.join(sorted(add_new.split(",")))
 
             dict_to_update.update({add_new: {
-                "value": np.round(BoundFromString(
+                "value": np.round(bound_from_string(
                     array_data, indices, choose_from_groups, add_new), 3),
                 "in_groups_left":  new_groups_left
             }})
@@ -234,7 +242,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
         already_used_in_group = choose_from_groups.copy()
         already_used_in_group[element[0]] -= 1
         level_results.update({element: {
-            "value": BoundFromString(
+            "value": bound_from_string(
                 array_data, indices, choose_from_groups, element),
             "in_groups_left": already_used_in_group
         }
@@ -254,14 +262,14 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
             for key in max_unique_keys:
                 selected_keys_to_traverse.update({key: level_results[key]})
 
-        # setting to continue level with top max_samples_for_branch highest value(s) + all dublicates
+        # setting to continue level with top max_samples_for_branch the highest value(s) + all dublicates
         else:
             max_unique_keys = sorted(
                 level_results, key=lambda x: level_results[x]["value"]
             )
             max_values = [level_results[x]["value"] for x in max_unique_keys]
 
-            # top max_samples_for_branch highest value(s)
+            # top max_samples_for_branch the highest value(s)
             max_values = np.unique(np.array(max_values)
                                    )[-max_samples_for_branch:]
 
@@ -277,7 +285,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
             second_recent_key_group = key[-(5 % len(key))]
             key_elems = key.split(",")
 
-            BndBCheckAndUpdate(key, fields, level_results)
+            bnb_check_and_update(key, fields, level_results)
         traversed_tree.append(selected_keys_to_traverse)
 
     traversed_tree.append(level_results)
@@ -285,7 +293,7 @@ def BranchAndBound(array_data, indices, choose_from_groups, max_samples_for_bran
     return traversed_tree
 
 
-def DataDictToTreedictConverter(dictionary):
+def data_dict_to_treedict_converter(dictionary):
     """
     Reformats BranchAndBound dictionary into other dictionary used to build a tree
     """

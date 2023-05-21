@@ -3,21 +3,21 @@ import numpy as np
 import itertools
 
 
-def UniqueThreeMax(array_data, indices, choose_from_groups):
+def unique_three_max(array_data, indices, choose_from_groups):
     pass
     # find which array intersects at 3-2, 3-1 or 2-1
     # (e.g. for 3-2-1 choosing the AB will be 3-2, AC 3-1, and BC 2-1)
-    choosed_values = list(choose_from_groups.values())
-    choosed_keys = list(choose_from_groups.keys())
+    chose_values = list(choose_from_groups.values())
+    chose_keys = list(choose_from_groups.keys())
     subarray32 = ''.join(sorted(
-        choosed_keys[choosed_values.index(3)] +
-        choosed_keys[choosed_values.index(2)]))
+        chose_keys[chose_values.index(3)] +
+        chose_keys[chose_values.index(2)]))
     subarray31 = ''.join(sorted(
-        choosed_keys[choosed_values.index(3)] +
-        choosed_keys[choosed_values.index(1)]))
+        chose_keys[chose_values.index(3)] +
+        chose_keys[chose_values.index(1)]))
     subarray21 = ''.join(sorted(
-        choosed_keys[choosed_values.index(2)] +
-        choosed_keys[choosed_values.index(1)]))
+        chose_keys[chose_values.index(2)] +
+        chose_keys[chose_values.index(1)]))
 
     intersected_subarrays = [subarray32, subarray31, subarray21]
 
@@ -59,7 +59,7 @@ def UniqueThreeMax(array_data, indices, choose_from_groups):
             ]
             array = array_data[tuple(first_max_element_position)]
 
-            # then, get second largest element with rows and columns different from first's
+            # then, get second-largest element with rows and columns different from first's
             stacked_2d_indices = np.dstack(sorted_2d_indices)
             for position in stacked_2d_indices[0]:
                 this_x = position[1]
@@ -120,18 +120,21 @@ def UniqueThreeMax(array_data, indices, choose_from_groups):
             tuple(third_max_element_position)]
 
 
-def InternalGroupCheck(indices_tuple, indices):
-    if indices['a'][0] <= indices_tuple[0] <= indices['a'][-1] and indices['a'][0] <= indices_tuple[1] <= indices['a'][-1]:
+def internal_group_check(indices_tuple, indices):
+    if indices['a'][0] <= indices_tuple[0] <= indices['a'][-1] \
+            and indices['a'][0] <= indices_tuple[1] <= indices['a'][-1]:
         return True
-    if indices['b'][0] <= indices_tuple[0] <= indices['b'][-1] and indices['b'][0] <= indices_tuple[1] <= indices['b'][-1]:
+    if indices['b'][0] <= indices_tuple[0] <= indices['b'][-1]\
+            and indices['b'][0] <= indices_tuple[1] <= indices['b'][-1]:
         return True
-    if indices['c'][0] <= indices_tuple[0] <= indices['c'][-1] and indices['c'][0] <= indices_tuple[1] <= indices['c'][-1]:
+    if indices['c'][0] <= indices_tuple[0] <= indices['c'][-1]\
+            and indices['c'][0] <= indices_tuple[1] <= indices['c'][-1]:
         return True
     return False
 
 
-def GreedyValue(array_data, indices, choose_from_groups):
-    three_unique_max = UniqueThreeMax(array_data, indices, choose_from_groups)
+def greedy_value(array_data, indices, choose_from_groups):
+    three_unique_max = unique_three_max(array_data, indices, choose_from_groups)
 
     all_indices = [item for sublist in three_unique_max for item in sublist]
 
@@ -143,7 +146,7 @@ def GreedyValue(array_data, indices, choose_from_groups):
 
     for el in all_elements:
         i = array_data[el]
-        if not InternalGroupCheck(el, indices):
+        if not internal_group_check(el, indices):
             partial_greedy_value += i
 
     return partial_greedy_value

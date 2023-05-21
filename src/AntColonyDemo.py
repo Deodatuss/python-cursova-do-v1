@@ -1,7 +1,3 @@
-import getopt
-import os
-import sys
-
 import numpy as np
 import converters
 import utilities
@@ -111,6 +107,8 @@ def main():
         if seed_start_point == '':
             raise Exception("Argument 'ssp' was not provided.")
 
+    data = converters.JSONToNumpy(input_relative_filename)
+    group_indices = utilities.get_group_indices(data)
     np.random.seed(seed_start_point)
     array_output_relative_filename = os.path.join(output_folder, "pheromone_array_output.txt")
     tree_output_relative_filename = os.path.join(output_folder, "ants_tree_output.txt")
@@ -119,7 +117,7 @@ def main():
     group_indices = utilities.GetGroupIndices(data)
     pheromone = np.ones(data.shape)
 
-    GreedyAlgorithm.GreedyValue(data, group_indices, how_much_to_choose)
+    GreedyAlgorithm.greedy_value(data, group_indices, how_much_to_choose)
 
     total_max_ant = {}
     total_corr_value = 0
@@ -128,20 +126,20 @@ def main():
     popular_vertices = []
 
     for i in range(number_of_iterations):
-        ants_paths = AntColony.AntIteration(
+        ants_paths = AntColony.ant_iteration(
             data, group_indices, how_much_to_choose, pheromone,
             ants_per_edge, influence_data, influence_pheromone)
 
-        AntColony.UpdatePheromoneArray(
+        AntColony.update_pheromone_array(
             data, group_indices, how_much_to_choose, pheromone,
             ants_paths, evaporation_coef)
 
         for ant, values in ants_paths[-1].items():
-            values['value'] = bnb.BoundFromString(
+            values['value'] = bnb.bound_from_string(
                 data, group_indices, how_much_to_choose, ant)
 
         # find max ant, but discard a tree because only last tree level is used
-        _, iter_max_ant = bnb.DataDictToTreedictConverter(
+        _, iter_max_ant = bnb.data_dict_to_treedict_converter(
             [ants_paths[-1]])
 
         for key, values in iter_max_ant.items():
@@ -152,7 +150,7 @@ def main():
         traversed_edges.append({})
         popular_vertices.append({})
         for key in ants_paths[-1].keys():
-            edge_tuples = AntColony.TraversedEdgesFromString(
+            edge_tuples = AntColony.traversed_edges_from_string(
                 group_indices, key)
             for tuple in edge_tuples:
                 if tuple in traversed_edges[-1]:
@@ -167,10 +165,10 @@ def main():
                 else:
                     popular_vertices[-1].update({tuple[1]: 0})
 
-    ants_paths_and_edges = AntColony.AddEdgeTraversesToStrings(
+    ants_paths_and_edges = AntColony.add_edge_traverses_to_strings(
         ants_paths, traversed_edges[-1], group_indices)
 
-    ants_tree_dict, _ = bnb.DataDictToTreedictConverter(
+    ants_tree_dict, _ = bnb.data_dict_to_treedict_converter(
         ants_paths_and_edges)
 
     # for iteration in traversed_edges:
@@ -188,7 +186,6 @@ def main():
             print(pheromone.round(decimals=3))
     i = 0
 
-    print('Done. Find output files in ' + output_folder)
 
 if __name__ == "__main__":
     main()

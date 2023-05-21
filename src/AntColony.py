@@ -1,12 +1,12 @@
 import numpy as np
-from branchAndBound import BoundFromString
+from branchAndBound import bound_from_string
 
 
-def ProbabilityOfAllPaths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
+def probability_of_all_paths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
     data_times_pheromone = {}
     sum_probability = 0
     for path, position in paths.items():
-        probability = MoveSimpleProbability(
+        probability = move_simple_probability(
             array_data[position], array_pheromone[position], influence_data, influence_pheromone)
         data_times_pheromone.update({path: probability})
         sum_probability += probability
@@ -20,12 +20,12 @@ def ProbabilityOfAllPaths(array_data, array_pheromone, influence_data, influence
     return edge_selection_probability, paths
 
 
-def MoveSimpleProbability(value_data, value_pheromone, influence_data, influence_pheromone):
+def move_simple_probability(value_data, value_pheromone, influence_data, influence_pheromone):
     return (value_data**influence_data) * \
         (value_pheromone**influence_pheromone)
 
 
-def IndexFromString(position, indices):
+def index_from_string(position, indices):
     group = position[0]
     local_position = int(position[1])
     for key in indices.keys():
@@ -33,16 +33,16 @@ def IndexFromString(position, indices):
             return indices[key][local_position-1]
 
 
-def MoveIndex(indices, new_path):
+def move_index(indices, new_path):
     new_move = new_path[-(2 % len(new_path)):]
     current_pos = new_path[-(5 % len(new_path)):-(5 % len(new_path))+2]
 
-    y = IndexFromString(new_move, indices)
-    x = IndexFromString(current_pos, indices)
+    y = index_from_string(new_move, indices)
+    x = index_from_string(current_pos, indices)
     return (y, x)
 
 
-def PossibleNewPathsForAnt(ant, all_entries):
+def possible_new_paths_for_ant(ant, all_entries):
     path = list(ant.keys())[0]
     recent_key_group = path[-(2 % len(path))]
     second_recent_key_group = path[-(5 % len(path))]
@@ -95,17 +95,17 @@ def PossibleNewPathsForAnt(ant, all_entries):
     return possible_paths
 
 
-def PossibleNextMoveIndex(array_data, indices, array_pheromone, all_entries, ant):
-    possible_paths = PossibleNewPathsForAnt(ant, all_entries)
+def possible_next_move_index(array_data, indices, array_pheromone, all_entries, ant):
+    possible_paths = possible_new_paths_for_ant(ant, all_entries)
     path_indices_to_new_element = {}
     for path in possible_paths:
-        index = MoveIndex(indices, path)
+        index = move_index(indices, path)
         path_indices_to_new_element.update({path: index})
     return path_indices_to_new_element
 
 
-def AntIteration(array_data, indices, choose_from_groups, array_pheromone,
-                 ants_per_element, influence_data, influence_pheromone):
+def ant_iteration(array_data, indices, choose_from_groups, array_pheromone,
+                  ants_per_element, influence_data, influence_pheromone):
     return_array_of_dict = []
 
     all_entries = []
@@ -133,24 +133,24 @@ def AntIteration(array_data, indices, choose_from_groups, array_pheromone,
     for layer in range(sum(choose_from_groups.values())-1):
         ant_iterator = 0
         for ant in ants:
-            paths_and_indices = PossibleNextMoveIndex(array_data, indices, array_pheromone,
-                                                      all_entries, ant)
-            probabilities, paths_only = ProbabilityOfAllPaths(
+            paths_and_indices = possible_next_move_index(array_data, indices, array_pheromone,
+                                                         all_entries, ant)
+            probabilities, paths_only = probability_of_all_paths(
                 array_data, array_pheromone, influence_data, influence_pheromone, paths_and_indices)
 
             # probabilities = [0.92, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
             random_number = np.random.rand(1)
             chosen_path_index = 0
-            sum_of_probabilites = 0
+            sum_of_propabilites = 0
             for prob in zip(probabilities, range(len(probabilities))):
-                sum_of_probabilites += prob[0]
-                if sum_of_probabilites > random_number:
+                sum_of_propabilites += prob[0]
+                if sum_of_propabilites > random_number:
                     chosen_path_index = prob[1]
                     break
 
             new_ant_path = paths_only[chosen_path_index]
-            added_value = array_data[MoveIndex(indices, new_ant_path)]
+            added_value = array_data[move_index(indices, new_ant_path)]
 
             for key, values in ant.items():
                 new_groups_left = values["in_groups_left"].copy()
@@ -170,7 +170,7 @@ def AntIteration(array_data, indices, choose_from_groups, array_pheromone,
     return return_array_of_dict
 
 
-def DataDictToPreferablePathsTreeDict(dictionary):
+def data_dict_to_preferable_paths_tree_dict(dictionary):
     """
     Reformats BranchAndBound dictionary into other dictionary used to build a tree
     """
@@ -212,18 +212,18 @@ def DataDictToPreferablePathsTreeDict(dictionary):
     return tree_compliant_dict, max_dict
 
 
-def TraversedEdgesFromString(indices, element_string):
+def traversed_edges_from_string(indices, element_string):
     vertices = element_string.split(",")
-    TraversedEdgesFromString = []
+    traversed_edges_from_string_array = []
     for index_tuple in zip(range(0, len(vertices)-1), range(1, len(vertices))):
-        x_position = IndexFromString(vertices[index_tuple[0]], indices)
-        y_position = IndexFromString(vertices[index_tuple[1]], indices)
+        x_position = index_from_string(vertices[index_tuple[0]], indices)
+        y_position = index_from_string(vertices[index_tuple[1]], indices)
 
-        TraversedEdgesFromString.append((x_position, y_position))
-    return TraversedEdgesFromString
+        traversed_edges_from_string_array.append((x_position, y_position))
+    return traversed_edges_from_string_array
 
 
-def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromone, ant_paths, evaporation_coef):
+def update_pheromone_array(array_data, indices, choose_from_groups, array_pheromone, ant_paths, evaporation_coef):
     full_paths = ant_paths[-1]
     values = []
     max_value = 0
@@ -233,7 +233,7 @@ def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromon
 
     # get values which shows how lucrative every path is
     for key in full_paths.keys():
-        ant_value = BoundFromString(
+        ant_value = bound_from_string(
             array_data, indices, choose_from_groups, key)
         values.append(ant_value)
         if ant_value > max_value:
@@ -241,20 +241,20 @@ def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromon
 
     # positive feedback on pheromones
     for key_and_value in zip(full_paths.keys(), values):
-        edges = TraversedEdgesFromString(indices, key_and_value[0])
+        edges = traversed_edges_from_string(indices, key_and_value[0])
         for edge in edges:
             array_pheromone[edge] += key_and_value[1]/max_value
             # change mirrored element too
             array_pheromone[edge[1], edge[0]] += key_and_value[1]/max_value
 
 
-def AddEdgeTraversesToStrings(ants_paths, traversed_edges, indices):
+def add_edge_traverses_to_strings(ants_paths, traversed_edges, indices):
     elements_plus_edges = [ants_paths[0]]
     for level in ants_paths[1:]:
         elements_plus_edges.append({})
         for key, values in level.items():
             elements = key.split(",")
-            el_indices = [IndexFromString(x, indices) for x in elements]
+            el_indices = [index_from_string(x, indices) for x in elements]
             new_string = ""
             for i in range(len(elements)-1):
                 new_string += elements[i]

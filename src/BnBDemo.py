@@ -64,19 +64,19 @@ def main():
             elif opt in ("--sl", "start_level="):
                 start_level = int(arg)
 
-        if input_file == '':
+        if(input_file == ''):
             raise Exception("Input file was not provided.")
-        if output_path == '':
-            raise Exception("Output folder was not provided.")
-        if how_much_to_choose['a'] == '':
+        if (output_path == ''):
+            raise Exception("Output file was not provided.")
+        if (how_much_to_choose['a'] == ''):
             raise Exception("Argument 'a' was not provided.")
-        if how_much_to_choose['b'] == '':
+        if (how_much_to_choose['b'] == ''):
             raise Exception("Argument 'b' was not provided.")
-        if how_much_to_choose['c'] == '':
+        if (how_much_to_choose['c'] == ''):
             raise Exception("Argument 'c' was not provided.")
-        if max_samples_for_branch == '':
+        if (max_samples_for_branch == ''):
             raise Exception("Argument 'msb' was not provided.")
-        if start_level == '':
+        if (start_level == ''):
             raise Exception("Argument 'sl' was not provided.")
 
     dict_output_relative_filename = os.path.join(output_path, "dict_output.json")
