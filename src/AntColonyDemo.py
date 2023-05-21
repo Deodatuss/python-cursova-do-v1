@@ -12,26 +12,109 @@ def main():
     """
     This function is used as a test and presentation for Ant Colony Algorithm functions and workflow
     """
-    input_folder = "data/demo/"
-    output_folder = "data/demo/ants/"
+    root_folder = os.path.dirname(os.path.abspath(__file__))
 
-    input_relative_filename = input_folder + "input.json"
-    array_output_relative_filename = output_folder + "pheromone_array_output.txt"
-    tree_output_relative_filename = output_folder + "ants_tree_output.txt"
+    input_file = ''
+    output_folder = ''
 
     # number of elements from each of three groups
     how_much_to_choose = {
-        'a': 1, 'b': 3, 'c': 2
+        'a': '', 'b': '', 'c': ''
     }
-    number_of_iterations = 15
-    ants_per_edge = 2
-    influence_data = 1
-    influence_pheromone = 0.8
-    evaporation_coef = 0.1
-    np.random.seed(0)
+    number_of_iterations = ''
+    ants_per_edge = ''
+    influence_data = ''
+    influence_pheromone = ''
+    evaporation_coef = ''
+    seed_start_point = ''
+
+    opts, args = getopt.getopt(sys.argv[1:], "hi:d:o:a:b:c:",
+                               ["input_file=",
+                                "output_path=",
+                                "a=", "b=", "c=",
+                                "id=",
+                                "noi=",
+                                "ape=",
+                                "iph=",
+                                "ecoef=",
+                                "ssp="])
+
+    is_default_values = next((arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
+
+    if is_default_values is not None:
+        input_file = os.path.join(root_folder, '..', 'data', 'demo', "input.json")
+        output_folder = os.path.join(root_folder, '..', 'data', 'demo', 'ants')
+
+        # number of elements from each of three groups
+        how_much_to_choose = {
+            'a': 1, 'b': 3, 'c': 2
+        }
+        number_of_iterations = 15
+        ants_per_edge = 2
+        influence_data = 1
+        influence_pheromone = 0.8
+        evaporation_coef = 0.1
+        seed_start_point = 0
+    else:
+        for opt, arg in opts:
+            if opt == '-h':
+                print(
+                    'python AntColonyDemo.py -i <inputfile.json> -o <outputfolder> -a <num to pick from a> -b <num to pick from b> -c <num to pick from c> --id=<influence data> --noi=<number of iterations> --ape=<ants per edge> --iph=<influence of pheromone> --ecoef=<evaporiation coef> --ssp=<random seed start point>')
+                sys.exit()
+            elif opt in ("-i", "input_file="):
+                input_file = arg
+            elif opt in ("-o", "output_path="):
+                output_folder = arg
+            elif opt in ("-a", "a="):
+                how_much_to_choose["a"] = int(arg)
+            elif opt in ("-b", "b="):
+                how_much_to_choose["b"] = int(arg)
+            elif opt in ("-c", "c="):
+                how_much_to_choose["c"] = int(arg)
+            elif opt in "--id":
+                influence_data = int(arg)
+            elif opt in "--iph":
+                influence_pheromone = float(arg)
+            elif opt in "--noi":
+                number_of_iterations = int(arg)
+            elif opt in "--ape":
+                ants_per_edge = int(arg)
+            elif opt in "--ecoef":
+                evaporation_coef = float(arg)
+            elif opt in "--ssp":
+                seed_start_point = int(arg)
+
+        if input_file == '':
+            raise Exception("Input file was not provided.")
+        if output_folder == '':
+            raise Exception("Output folder was not provided.")
+        if how_much_to_choose['a'] == '':
+            raise Exception("Argument 'a' was not provided.")
+        if how_much_to_choose['b'] == '':
+            raise Exception("Argument 'b' was not provided.")
+        if how_much_to_choose['c'] == '':
+            raise Exception("Argument 'c' was not provided.")
+        if influence_data == '':
+            raise Exception("Argument 'id' was not provided.")
+        if influence_pheromone == '':
+            raise Exception("Argument 'iph' was not provided.")
+        if number_of_iterations == '':
+            raise Exception("Argument 'noi' was not provided.")
+        if ants_per_edge == '':
+            raise Exception("Argument 'ape' was not provided.")
+        if evaporation_coef == '':
+            raise Exception("Argument 'ecoef' was not provided.")
+        if seed_start_point == '':
+            raise Exception("Argument 'ssp' was not provided.")
 
     data = converters.JSONToNumpy(input_relative_filename)
     group_indices = utilities.get_group_indices(data)
+    np.random.seed(seed_start_point)
+    array_output_relative_filename = os.path.join(output_folder, "pheromone_array_output.txt")
+    tree_output_relative_filename = os.path.join(output_folder, "ants_tree_output.txt")
+
+    data = converters.JSONToNumpy(input_file)
+    group_indices = utilities.GetGroupIndices(data)
     pheromone = np.ones(data.shape)
 
     GreedyAlgorithm.greedy_value(data, group_indices, how_much_to_choose)

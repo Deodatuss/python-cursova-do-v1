@@ -34,8 +34,7 @@ def main():
 
     is_default_values = next((arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
 
-    if(is_default_values is not None):
-        root_folder = os.path.dirname(os.path.abspath(__file__))
+    if is_default_values is not None:
         input_file = os.path.join(root_folder, '..', 'data', 'demo', "importData.csv")
         output_path = os.path.join(root_folder, '..', 'data', 'demo')
         # number of elements from each of three groups
@@ -65,7 +64,7 @@ def main():
             elif opt in ("--sl", "start_level="):
                 start_level = int(arg)
 
-        if (input_file == ''):
+        if(input_file == ''):
             raise Exception("Input file was not provided.")
         if (output_path == ''):
             raise Exception("Output file was not provided.")
@@ -84,11 +83,11 @@ def main():
     tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
 
     data = converters.CSVToNumpy(input_file)
-    group_indices = utilities.get_group_indices(data)
+    group_indices = utilities.GetGroupIndices(data)
 
-    high_bound = bnb.high_bound(data, group_indices, how_much_to_choose)
+    high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
 
-    tr_tree = bnb.branch_and_bound(
+    tr_tree = bnb.BranchAndBound(
         data,
         group_indices,
         how_much_to_choose,
@@ -104,7 +103,7 @@ def main():
     with open(dict_output_relative_filename, 'w') as fp:
         json.dump(dict_for_json, fp)
 
-    final_tree, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
+    final_tree, max_dict = bnb.DataDictToTreedictConverter(tr_tree)
 
     # final tree has a structure similar to this:
     # test_tree_dict = {
