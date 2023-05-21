@@ -293,7 +293,7 @@ def branch_and_bound(array_data, indices, choose_from_groups, max_samples_for_br
     return traversed_tree
 
 
-def DataDictToTreedictConverter(dictionary):
+def data_dict_to_treedict_converter(dictionary):
     """
     Reformats BranchAndBound dictionary into other dictionary used to build a tree
     """

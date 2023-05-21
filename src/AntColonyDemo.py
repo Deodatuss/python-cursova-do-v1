@@ -56,7 +56,7 @@ def main():
                 data, group_indices, how_much_to_choose, ant)
 
         # find max ant, but discard a tree because only last tree level is used
-        _, iter_max_ant = bnb.DataDictToTreedictConverter(
+        _, iter_max_ant = bnb.data_dict_to_treedict_converter(
             [ants_paths[-1]])
 
         for key, values in iter_max_ant.items():
@@ -85,7 +85,7 @@ def main():
     ants_paths_and_edges = AntColony.add_edge_traverses_to_strings(
         ants_paths, traversed_edges[-1], group_indices)
 
-    ants_tree_dict, _ = bnb.DataDictToTreedictConverter(
+    ants_tree_dict, _ = bnb.data_dict_to_treedict_converter(
         ants_paths_and_edges)
 
     # for iteration in traversed_edges:
