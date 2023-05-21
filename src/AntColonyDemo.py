@@ -52,7 +52,7 @@ def main():
             ants_paths, evaporation_coef)
 
         for ant, values in ants_paths[-1].items():
-            values['value'] = bnb.BoundFromString(
+            values['value'] = bnb.bound_from_string(
                 data, group_indices, how_much_to_choose, ant)
 
         # find max ant, but discard a tree because only last tree level is used
