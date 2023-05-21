@@ -83,11 +83,11 @@ def main():
     tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
 
     data = converters.CSVToNumpy(input_file)
-    group_indices = utilities.GetGroupIndices(data)
+    group_indices = utilities.get_group_indices(data)
 
-    high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
+    high_bound = bnb.high_bound(data, group_indices, how_much_to_choose)
 
-    tr_tree = bnb.BranchAndBound(
+    tr_tree = bnb.branch_and_bound(
         data,
         group_indices,
         how_much_to_choose,
@@ -103,7 +103,7 @@ def main():
     with open(dict_output_relative_filename, 'w') as fp:
         json.dump(dict_for_json, fp)
 
-    final_tree, max_dict = bnb.DataDictToTreedictConverter(tr_tree)
+    final_tree, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
 
     # final tree has a structure similar to this:
     # test_tree_dict = {
