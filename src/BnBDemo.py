@@ -65,7 +65,7 @@ def main():
             elif opt in ("--sl", "start_level="):
                 start_level = int(arg)
 
-        if(input_file == ''):
+        if (input_file == ''):
             raise Exception("Input file was not provided.")
         if (output_path == ''):
             raise Exception("Output file was not provided.")
@@ -84,7 +84,7 @@ def main():
     tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
 
     data = converters.CSVToNumpy(input_file)
-    group_indices = utilities.GetGroupIndices(data)
+    group_indices = utilities.get_group_indices(data)
 
     high_bound = bnb.high_bound(data, group_indices, how_much_to_choose)
 

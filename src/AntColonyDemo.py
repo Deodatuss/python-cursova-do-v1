@@ -31,7 +31,7 @@ def main():
     np.random.seed(0)
 
     data = converters.JSONToNumpy(input_relative_filename)
-    group_indices = utilities.GetGroupIndices(data)
+    group_indices = utilities.get_group_indices(data)
     pheromone = np.ones(data.shape)
 
     GreedyAlgorithm.greedy_value(data, group_indices, how_much_to_choose)

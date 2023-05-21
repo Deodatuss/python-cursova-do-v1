@@ -1,4 +1,4 @@
-def GetGroupsSize(numpy_array):
+def get_groups_size(numpy_array):
     result = {
         "a":
         {
@@ -29,8 +29,8 @@ def GetGroupsSize(numpy_array):
     return result
 
 
-def GetGroupIndices(data):
-    group_size = GetGroupsSize(data)
+def get_group_indices(data):
+    group_size = get_groups_size(data)
     """
     return group_indices in such format and keys:
     group_indices = {
@@ -55,7 +55,7 @@ def GetGroupIndices(data):
     return group_indices
 
 
-def PartialValueToFull(partial_value: float, choose_from_groups) -> float:
+def partial_value_to_full(partial_value: float, choose_from_groups) -> float:
     full_value = (partial_value*2) + (
         choose_from_groups['a']**2 +
         choose_from_groups['b']**2 +
@@ -64,7 +64,7 @@ def PartialValueToFull(partial_value: float, choose_from_groups) -> float:
     return full_value
 
 
-def FullValueToPartial(full_value: float, choose_from_groups) -> float:
+def full_value_to_partial(full_value: float, choose_from_groups) -> float:
     partial_value = ((full_value -
                       choose_from_groups['a']**2 -
                       choose_from_groups['b']**2 -
