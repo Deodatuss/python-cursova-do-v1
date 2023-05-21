@@ -34,7 +34,7 @@ def main():
     group_indices = utilities.GetGroupIndices(data)
     pheromone = np.ones(data.shape)
 
-    GreedyAlgorithm.GreedyValue(data, group_indices, how_much_to_choose)
+    GreedyAlgorithm.greedy_value(data, group_indices, how_much_to_choose)
 
     total_max_ant = {}
     total_corr_value = 0
