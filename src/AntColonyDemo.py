@@ -1,3 +1,7 @@
+import getopt
+import os
+import sys
+
 import numpy as np
 import converters
 import utilities
@@ -107,14 +111,14 @@ def main():
         if seed_start_point == '':
             raise Exception("Argument 'ssp' was not provided.")
 
-    data = converters.JSONToNumpy(input_relative_filename)
+    data = converters.JSONToNumpy(input_file)
     group_indices = utilities.get_group_indices(data)
     np.random.seed(seed_start_point)
     array_output_relative_filename = os.path.join(output_folder, "pheromone_array_output.txt")
     tree_output_relative_filename = os.path.join(output_folder, "ants_tree_output.txt")
 
     data = converters.JSONToNumpy(input_file)
-    group_indices = utilities.GetGroupIndices(data)
+    group_indices = utilities.get_group_indices(data)
     pheromone = np.ones(data.shape)
 
     GreedyAlgorithm.greedy_value(data, group_indices, how_much_to_choose)
