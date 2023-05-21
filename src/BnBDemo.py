@@ -104,7 +104,7 @@ def main():
     with open(dict_output_relative_filename, 'w') as fp:
         json.dump(dict_for_json, fp)
 
-    final_tree, max_dict = bnb.DataDictToTreedictConverter(tr_tree)
+    final_tree, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
 
     # final tree has a structure similar to this:
     # test_tree_dict = {
