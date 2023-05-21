@@ -1,5 +1,5 @@
 import numpy as np
-from branchAndBound import BoundFromString
+from branchAndBound import bound_from_string
 
 
 def ProbabilityOfAllPaths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
@@ -233,7 +233,7 @@ def UpdatePheromoneArray(array_data, indices, choose_from_groups, array_pheromon
 
     # get values which shows how lucrative every path is
     for key in full_paths.keys():
-        ant_value = BoundFromString(
+        ant_value = bound_from_string(
             array_data, indices, choose_from_groups, key)
         values.append(ant_value)
         if ant_value > max_value:

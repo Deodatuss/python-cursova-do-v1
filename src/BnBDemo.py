@@ -86,9 +86,9 @@ def main():
     data = converters.CSVToNumpy(input_file)
     group_indices = utilities.GetGroupIndices(data)
 
-    high_bound = bnb.HighBound(data, group_indices, how_much_to_choose)
+    high_bound = bnb.high_bound(data, group_indices, how_much_to_choose)
 
-    tr_tree = bnb.BranchAndBound(
+    tr_tree = bnb.branch_and_bound(
         data,
         group_indices,
         how_much_to_choose,
