@@ -18,7 +18,7 @@ elements_to_choose_from_each_group = [how_much_to_choose]
 
 data = converters.JSONToNumpy(input_relative_filename)
 
-groups_info = utilities.GetGroupsSize(data)
+groups_info = utilities.get_groups_size(data)
 
 a = [groups_info["a"]["size"], groups_info["b"]
      ["size"], groups_info["c"]["size"]]
