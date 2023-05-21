@@ -43,11 +43,11 @@ def main():
     popular_vertices = []
 
     for i in range(number_of_iterations):
-        ants_paths = AntColony.AntIteration(
+        ants_paths = AntColony.ant_iteration(
             data, group_indices, how_much_to_choose, pheromone,
             ants_per_edge, influence_data, influence_pheromone)
 
-        AntColony.UpdatePheromoneArray(
+        AntColony.update_pheromone_array(
             data, group_indices, how_much_to_choose, pheromone,
             ants_paths, evaporation_coef)
 
@@ -67,7 +67,7 @@ def main():
         traversed_edges.append({})
         popular_vertices.append({})
         for key in ants_paths[-1].keys():
-            edge_tuples = AntColony.TraversedEdgesFromString(
+            edge_tuples = AntColony.traversed_edges_from_string(
                 group_indices, key)
             for tuple in edge_tuples:
                 if tuple in traversed_edges[-1]:
@@ -82,7 +82,7 @@ def main():
                 else:
                     popular_vertices[-1].update({tuple[1]: 0})
 
-    ants_paths_and_edges = AntColony.AddEdgeTraversesToStrings(
+    ants_paths_and_edges = AntColony.add_edge_traverses_to_strings(
         ants_paths, traversed_edges[-1], group_indices)
 
     ants_tree_dict, _ = bnb.DataDictToTreedictConverter(
