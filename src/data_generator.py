@@ -1,19 +1,27 @@
 import random
+import string
 
 import numpy as np
 
 
-def generate_compatibility_matrix(a_size: int, b_size: int, c_size: int):
+def generate_compatibility_matrix(a_size: int, b_size: int, c_size: int, generate_method: string = 'normalvariate'):
+    def generate_value(generate_method: string):
+        if generate_method == 'normalvariate':
+            value = round(random.normalvariate(0.5, 0.25), 2)
+        else:
+            value = round(random.random(), 2)
+
+        if value < 0:
+            return 0
+        return value
+
+
     matrix_size = a_size + b_size + c_size
     compatibility_matrix = [[0 for x in range(matrix_size)] for y in range(matrix_size)]
 
     for i in range(matrix_size):
         for j in range(i, matrix_size):
-            value = round(random.normalvariate(0.5, 0.25), 2)
-            if value < 0:
-                compatibility_matrix[i][j] = 0
-            else:
-                compatibility_matrix[i][j] = value
+            compatibility_matrix[i][j] = generate_value(generate_method)
 
     for i in range(matrix_size):
         for j in range(i, matrix_size):
