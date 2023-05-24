@@ -8,6 +8,8 @@ def generate_compatibility_matrix(a_size: int, b_size: int, c_size: int, generat
     def generate_value(generate_method: string):
         if generate_method == 'normalvariate':
             value = round(random.normalvariate(0.5, 0.25), 2)
+        elif generate_method == 'lognormvariate':
+            value = round(random.lognormvariate(0.5, 0.25), 2)
         else:
             value = round(random.random(), 2)
 
