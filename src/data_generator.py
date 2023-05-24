@@ -31,4 +31,4 @@ def generate_compatibility_matrix(a_size: int, b_size: int, c_size: int):
         for j in range(a_size + b_size, a_size + b_size + c_size):
             compatibility_matrix[i][j] = 1
 
-    return compatibility_matrix
+    return np.array(compatibility_matrix)
