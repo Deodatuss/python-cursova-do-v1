@@ -34,8 +34,12 @@ def index_from_string(position, indices):
 
 
 def move_index(indices, new_path):
-    new_move = new_path[-(2 % len(new_path)):]
-    current_pos = new_path[-(5 % len(new_path)):-(5 % len(new_path))+2]
+    new_move = new_path.split(',')[-1]
+    current_pos = ''
+    try:
+        current_pos = new_path.split(',')[-2]
+    except:
+        pass
 
     y = index_from_string(new_move, indices)
     x = index_from_string(current_pos, indices)
@@ -154,7 +158,7 @@ def ant_iteration(array_data, indices, choose_from_groups, array_pheromone,
 
             for key, values in ant.items():
                 new_groups_left = values["in_groups_left"].copy()
-                new_groups_left[new_ant_path[-2]] -= 1
+                new_groups_left[new_ant_path.split(',')[-1][0]] -= 1
                 new_ant = {new_ant_path: {
                     "value": values['value']+added_value,
                     "in_groups_left": new_groups_left
