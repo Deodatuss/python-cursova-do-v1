@@ -4,17 +4,23 @@ import string
 import numpy as np
 
 
-def generate_compatibility_matrix(a_size: int, b_size: int, c_size: int, generate_method: string = 'normalvariate'):
+def generate_compatibility_matrix(
+        a_size: int,
+        b_size: int,
+        c_size: int,
+        generate_method: string = 'normalvariate',
+        mean: float = 0.5,
+        dispersion: float = 0.5):
     def generate_value(generate_method: string):
         if generate_method == 'normalvariate':
-            value = round(random.normalvariate(0.5, 0.25), 2)
+            value = round(random.normalvariate(mean, dispersion), 2)
         elif generate_method == 'lognormvariate':
-            value = round(random.lognormvariate(0.5, 0.25), 2)
+            value = round(random.lognormvariate(mean, dispersion), 2)
         else:
             value = round(random.random(), 2)
 
-        if value < 0:
-            return 0
+        if value < 0: return 0
+        if value > 1: return 1
         return value
 
 
