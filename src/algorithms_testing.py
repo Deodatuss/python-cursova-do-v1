@@ -223,13 +223,12 @@ def OverallTimeTesting(min_task_size=4, max_task_size=14, step=1):
     PlotData()
 
 
-def bnb_testing(
+def bnb_mean_testing(
         task_size: int,
         max_samples_for_branch: int,
         start_level,
         mean: float,
-        dispersion: float,
-        mean_step: float = 0.1,
+        mean_step: float,
         iterations: int = 10):
     all_possible_choosings = [i for i in permutations([1, 2, 3], 3)]
 
@@ -241,80 +240,176 @@ def bnb_testing(
 
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
-    for i in range(iterations):
-        data = generate_compatibility_matrix(
-            task_size,
-            task_size,
-            task_size,
-            mean=mean,
-            dispersion=dispersion)
 
-        group_indices = utilities.get_group_indices(data)
+    for j in range(mean, 0.9, mean_step):
+        for i in range(iterations):
+            data = generate_compatibility_matrix(
+                task_size,
+                task_size,
+                task_size,
+                mean=j,
+                dispersion=1)
 
-        print("reg bnb iteration ", i, " of ", task_size)
+            group_indices = utilities.get_group_indices(data)
 
+            print("reg bnb iteration ", i, " of ", task_size)
+
+            # gc.collect()
+            start_time = time.process_time()
+
+            current_max = -1
+            for i in all_possible_choosings:
+                how_much_to_choose = {
+                    'a': i[0], 'b': i[1], 'c': i[2]
+                }
+
+                tr_tree = bnb.branch_and_bound(
+                    data,
+                    group_indices,
+                    how_much_to_choose,
+                    max_samples_for_branch=1,
+                    start_level=0)
+
+                _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
+
+                algo_results = next(iter(max_dict.values()))['value']
+                if current_max < algo_results:
+                    current_max = algo_results
+            end_time = time.process_time() - start_time
+
+            max_result_bnb_orig_iteration.append(current_max)
+            execution_time_bnb_orig_iteration.append(end_time)
+
+        max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
+        execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+
+        max_result_bnb_modified_iteration = []
+        execution_time_bnb_modified_iteration = []
         # gc.collect()
-        start_time = time.process_time()
+        for i in range(iterations):
+            print("bnb modified iteration ", i, " of ", task_size)
+            start_time = time.process_time()
 
-        current_max = -1
-        for i in all_possible_choosings:
-            how_much_to_choose = {
-                'a': i[0], 'b': i[1], 'c': i[2]
-            }
+            current_max = -1
+            for i in all_possible_choosings:
+                how_much_to_choose = {
+                    'a': i[0], 'b': i[1], 'c': i[2]
+                }
 
-            tr_tree = bnb.branch_and_bound(
-                data,
-                group_indices,
-                how_much_to_choose,
-                max_samples_for_branch=1,
-                start_level=0)
+                tr_tree = bnb.branch_and_bound(
+                    data,
+                    group_indices,
+                    how_much_to_choose,
+                    max_samples_for_branch,
+                    0)
 
-            _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
+                _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
 
-            algo_results = next(iter(max_dict.values()))['value']
-            if current_max < algo_results:
-                current_max = algo_results
-        end_time = time.process_time() - start_time
+                algo_results = next(iter(max_dict.values()))['value']
+                if current_max < algo_results:
+                    current_max = algo_results
+            end_time = time.process_time() - start_time
 
-        max_result_bnb_orig_iteration.append(current_max)
-        execution_time_bnb_orig_iteration.append(end_time)
+            max_result_bnb_modified_iteration.append(current_max)
+            execution_time_bnb_modified_iteration.append(end_time)
 
-    max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
-    execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+        max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
+        execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
+    value_to_stop_debugger = 'hello'
 
-    max_result_bnb_modified_iteration = []
-    execution_time_bnb_modified_iteration = []
+def bnb_dispersion_testing(
+        task_size: int,
+        max_samples_for_branch: int,
+        start_level,
+        dispersion: float,
+        dispersion_step: float,
+        iterations: int = 10):
+    all_possible_choosings = [i for i in permutations([1, 2, 3], 3)]
+
+    max_result_bnb_orig = []
+    execution_time_bnb_orig = []
+
+    execution_time_bnb_modified = []
+    max_result_bnb_modified = []
+
+    max_result_bnb_orig_iteration = []
+    execution_time_bnb_orig_iteration = []
+
+    for j in range(dispersion, 5, dispersion_step):
+        for i in range(iterations):
+            data = generate_compatibility_matrix(
+                task_size,
+                task_size,
+                task_size,
+                mean=0.5,
+                dispersion=j)
+
+            group_indices = utilities.get_group_indices(data)
+
+            print("reg bnb iteration ", i, " of ", task_size)
+
+            # gc.collect()
+            start_time = time.process_time()
+
+            current_max = -1
+            for i in all_possible_choosings:
+                how_much_to_choose = {
+                    'a': i[0], 'b': i[1], 'c': i[2]
+                }
+
+                tr_tree = bnb.branch_and_bound(
+                    data,
+                    group_indices,
+                    how_much_to_choose,
+                    max_samples_for_branch=1,
+                    start_level=0)
+
+                _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
+
+                algo_results = next(iter(max_dict.values()))['value']
+                if current_max < algo_results:
+                    current_max = algo_results
+            end_time = time.process_time() - start_time
+
+            max_result_bnb_orig_iteration.append(current_max)
+            execution_time_bnb_orig_iteration.append(end_time)
+
+        max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
+        execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+
+        max_result_bnb_modified_iteration = []
+        execution_time_bnb_modified_iteration = []
         # gc.collect()
-    for i in range(iterations):
-        print("bnb modified iteration ", i, " of ", task_size)
-        start_time = time.process_time()
+        for i in range(iterations):
+            print("bnb modified iteration ", i, " of ", task_size)
+            start_time = time.process_time()
 
-        current_max = -1
-        for i in all_possible_choosings:
-            how_much_to_choose = {
-                'a': i[0], 'b': i[1], 'c': i[2]
-            }
+            current_max = -1
+            for i in all_possible_choosings:
+                how_much_to_choose = {
+                    'a': i[0], 'b': i[1], 'c': i[2]
+                }
 
-            tr_tree = bnb.branch_and_bound(
-                data,
-                group_indices,
-                how_much_to_choose,
-                max_samples_for_branch,
-                start_level)
+                tr_tree = bnb.branch_and_bound(
+                    data,
+                    group_indices,
+                    how_much_to_choose,
+                    max_samples_for_branch,
+                    start_level)
 
-            _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
+                _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
 
-            algo_results = next(iter(max_dict.values()))['value']
-            if current_max < algo_results:
-                current_max = algo_results
-        end_time = time.process_time() - start_time
+                algo_results = next(iter(max_dict.values()))['value']
+                if current_max < algo_results:
+                    current_max = algo_results
+            end_time = time.process_time() - start_time
 
-        max_result_bnb_modified_iteration.append(current_max)
-        execution_time_bnb_modified_iteration.append(end_time)
+            max_result_bnb_modified_iteration.append(current_max)
+            execution_time_bnb_modified_iteration.append(end_time)
 
-    max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
-    execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
-
+        max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
+        execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
+    k = 5
 
 def main():
     # algo needs
@@ -332,7 +427,9 @@ def main():
     first = [2, 3, 4, 5, 6]
     second = [3, 4, 6, 5, 4]
 
-    OverallTimeTesting()
+    # OverallTimeTesting()
+    bnb_mean_testing(7, 2, 2, 0.5, 0.1, 10)
+    bnb_dispersion_testing(7, 2, 2, 0.5, 0.1, 10)
 
     # number_of_iterations = 15
     # ants_per_edge = 2
