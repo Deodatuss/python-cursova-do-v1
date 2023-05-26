@@ -32,10 +32,12 @@ def main():
                                 "sl=",
                                 "start_level="])
 
-    is_default_values = next((arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
+    is_default_values = next(
+        (arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
 
     if is_default_values is not None:
-        input_file = os.path.join(root_folder, '..', 'data', 'demo', "importData.csv")
+        input_file = os.path.join(
+            root_folder, '..', 'data', 'demo', "importData.csv")
         output_path = os.path.join(root_folder, '..', 'data', 'demo')
         # number of elements from each of three groups
         how_much_to_choose = {
@@ -49,22 +51,22 @@ def main():
                 print(
                     'python BnBDemo.py -i <inputfile.csv> -o <outputpath> -a <num to pick from a> -b <num to pick from b> -c <num to pick from c> --msb=<max samples for branch> -sl=<start level>')
                 sys.exit()
-            elif opt in ("-i", "input_file="):
+            elif opt in "--input_file=":
                 input_file = arg
-            elif opt in ("-o", "output_path="):
+            elif opt in "--output_path=":
                 output_path = arg
-            elif opt in ("-a", "a="):
+            elif opt in "--a=":
                 how_much_to_choose["a"] = int(arg)
-            elif opt in ("-b", "b="):
+            elif opt in "--b=":
                 how_much_to_choose["b"] = int(arg)
-            elif opt in ("-c", "c="):
+            elif opt in "--c=":
                 how_much_to_choose["c"] = int(arg)
-            elif opt in ("--msb", "max_samples_for_branch="):
+            elif opt in "--msb" or opt in "--max_samples_for_branch=":
                 max_samples_for_branch = int(arg)
-            elif opt in ("--sl", "start_level="):
+            elif opt in "--sl" or opt in "--start_level=":
                 start_level = int(arg)
 
-        if(input_file == ''):
+        if (input_file == ''):
             raise Exception("Input file was not provided.")
         if (output_path == ''):
             raise Exception("Output file was not provided.")
@@ -79,8 +81,10 @@ def main():
         if (start_level == ''):
             raise Exception("Argument 'sl' was not provided.")
 
-    dict_output_relative_filename = os.path.join(output_path, "dict_output.json")
-    tree_output_relative_filename = os.path.join(output_path, "tree_output.txt")
+    dict_output_relative_filename = os.path.join(
+        output_path, "dict_output.json")
+    tree_output_relative_filename = os.path.join(
+        output_path, "tree_output.txt")
 
     data = converters.CSVToNumpy(input_file)
     group_indices = utilities.get_group_indices(data)
@@ -119,6 +123,7 @@ def main():
             utilities.ptree(-1, final_tree, indent_width=9)
 
     print('Done. Find output files in ' + output_path)
+
 
 if __name__ == "__main__":
     main()

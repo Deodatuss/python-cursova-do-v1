@@ -15,14 +15,43 @@ def get_groups_size(numpy_array):
     }
     counter = 0
 
+    first_block_size = 0
+    # first block from left to right row
     while (numpy_array[0][counter] == 1):
-        result["a"]["size"] += 1
+        first_block_size += 1
         counter += 1
 
+    # first block full check from up to bottom
+    i = j = 0
+    while (i < first_block_size):
+        while (j < first_block_size):
+            if numpy_array[i, j] != 1:
+                first_block_size -= 1
+                i = j = 0
+            j += 1
+        j = 0
+        i += 1
+    result["a"]["size"] = counter = first_block_size
+
+    second_block_size = 0
+    # second block from left to right row
     while (numpy_array[result["a"]["size"]][counter] == 1):
-        result["b"]["size"] += 1
+        second_block_size += 1
         counter += 1
 
+    # second block full check from up to bottom
+    i = j = 0
+    while (i < second_block_size):
+        while (j < second_block_size):
+            if numpy_array[i+first_block_size, j+first_block_size] != 1:
+                second_block_size -= 1
+                i = j = 0
+            j += 1
+        j = 0
+        i += 1
+    result["b"]["size"] = counter = second_block_size
+
+    # third block from left to right row
     result["c"]["size"] = numpy_array.shape[0] - \
         (result["a"]["size"]+result["b"]["size"])
 

@@ -22,13 +22,14 @@ def average(
 
 
 def ant_colony_testing(
+    iterations: int,
+    task_size: int,
     alfa_pheromone_influence=-1,
     beta_data_influence=-1,
     p_evaporation_coeficient=-1,
     gamma_number_of_iterations=-1,
     theta_number_of_ants_per_vertice=-1,
-    iterations: int = 10,
-    task_size: int = 8
+
 ):
     size = task_size
     variants = iterations
@@ -342,6 +343,8 @@ def ant_colony_testing(
 
 
 def main():
+    whole_iterations = 1
+    task_size = 5
     alfa_pheromone_influence = -1
     beta_data_influence = -1
     p_evaporation_coeficient = -1
@@ -350,29 +353,36 @@ def main():
     output_path = ''
 
     opts, args = getopt.getopt(sys.argv[1:], "h",
-                               ["api=",
+                               ["iter=",
+                                "ts=",
+                                "api=",
                                 "bdi=",
                                 "pec=",
                                 "gni=",
-                                "tnav="])
+                                "tnav=",
+                                "output_path="])
 
     for opt, arg in opts:
         if opt == '-h':
             print(
-                'python overall_time_testing.py [--min_ts=<min task size>]'
-                ' [--max_ts=<max task size>] [--step_size=<step size>]'
-                ' [--output_path=<output path>]')
+                'python overall_time_testing.py [--api=<_>]'
+                ' [--bdi=<_>] [--pec=<_>]'
+                ' [--gni=<_] [--tnav=]')
             sys.exit()
+        elif opt in "--iter=":
+            whole_iterations = int(arg)
+        elif opt in "--ts=":
+            task_size = int(arg)
         elif opt in "--api=":
-            alfa_pheromone_influence = int(arg)
+            alfa_pheromone_influence = float(arg)
         elif opt in "--bdi=":
-            beta_data_influence = int(arg)
+            beta_data_influence = float(arg)
         elif opt in "--pec=":
             p_evaporation_coeficient = float(arg)
         elif opt in "--gni=":
             gamma_number_of_iterations = int(arg)
         elif opt in "--tnav=":
-            theta_number_of_ants_per_vertice = float(arg)
+            theta_number_of_ants_per_vertice = int(arg)
         elif opt in "--output_path=":
             output_path = arg
 
@@ -381,7 +391,9 @@ def main():
     # ant_colony_testing(0.8, 0.1, -1, 10, 1)
     # ant_colony_testing(0.8, 0.1, 0.3, -1, 1)
     # ant_colony_testing(0.8, 0.1, 0.3, 10, -1)
-    ant_colony_testing(alfa_pheromone_influence,
+    ant_colony_testing(whole_iterations,
+                       task_size,
+                       alfa_pheromone_influence,
                        beta_data_influence,
                        p_evaporation_coeficient,
                        gamma_number_of_iterations,

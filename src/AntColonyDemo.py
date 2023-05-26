@@ -43,10 +43,12 @@ def main():
                                 "ecoef=",
                                 "ssp="])
 
-    is_default_values = next((arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
+    is_default_values = next(
+        (arg for opt, arg in opts if opt == "-d" and arg == 'true'), None)
 
     if is_default_values is not None:
-        input_file = os.path.join(root_folder, '..', 'data', 'demo', "input.json")
+        input_file = os.path.join(
+            root_folder, '..', 'data', 'demo', "input.json")
         output_folder = os.path.join(root_folder, '..', 'data', 'demo', 'ants')
 
         # number of elements from each of three groups
@@ -65,27 +67,27 @@ def main():
                 print(
                     'python AntColonyDemo.py -i <inputfile.json> -o <outputfolder> -a <num to pick from a> -b <num to pick from b> -c <num to pick from c> --id=<influence data> --noi=<number of iterations> --ape=<ants per edge> --iph=<influence of pheromone> --ecoef=<evaporiation coef> --ssp=<random seed start point>')
                 sys.exit()
-            elif opt in ("-i", "input_file="):
+            elif opt in "--input_file=":
                 input_file = arg
-            elif opt in ("-o", "output_path="):
+            elif opt in "--output_path=":
                 output_folder = arg
-            elif opt in ("-a", "a="):
+            elif opt in "--a=":
                 how_much_to_choose["a"] = int(arg)
-            elif opt in ("-b", "b="):
+            elif opt in "--b=":
                 how_much_to_choose["b"] = int(arg)
-            elif opt in ("-c", "c="):
+            elif opt in "--c=":
                 how_much_to_choose["c"] = int(arg)
-            elif opt in "--id":
-                influence_data = int(arg)
-            elif opt in "--iph":
+            elif opt in "--id=":
+                influence_data = float(arg)
+            elif opt in "--iph=":
                 influence_pheromone = float(arg)
-            elif opt in "--noi":
+            elif opt in "--noi=":
                 number_of_iterations = int(arg)
-            elif opt in "--ape":
+            elif opt in "--ape=":
                 ants_per_edge = int(arg)
-            elif opt in "--ecoef":
+            elif opt in "--ecoef=":
                 evaporation_coef = float(arg)
-            elif opt in "--ssp":
+            elif opt in "--ssp=":
                 seed_start_point = int(arg)
 
         if input_file == '':
@@ -114,8 +116,10 @@ def main():
     data = converters.JSONToNumpy(input_file)
     group_indices = utilities.get_group_indices(data)
     np.random.seed(seed_start_point)
-    array_output_relative_filename = os.path.join(output_folder, "pheromone_array_output.txt")
-    tree_output_relative_filename = os.path.join(output_folder, "ants_tree_output.txt")
+    array_output_relative_filename = os.path.join(
+        output_folder, "pheromone_array_output.txt")
+    tree_output_relative_filename = os.path.join(
+        output_folder, "ants_tree_output.txt")
 
     data = converters.JSONToNumpy(input_file)
     group_indices = utilities.get_group_indices(data)
@@ -184,7 +188,7 @@ def main():
             utilities.ptree(-1, ants_tree_dict)
 
     np.set_printoptions(precision=3, linewidth=300)
-    print(pheromone)
+    # print(pheromone)
     with open(array_output_relative_filename, 'w', encoding="utf-8") as f:
         with redirect_stdout(f):
             print(pheromone.round(decimals=3))

@@ -10,7 +10,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import permutations
 
-import utilities, AntColony, branchAndBound as bnb
+import utilities
+import AntColony
+import branchAndBound as bnb
 from data_generator import generate_compatibility_matrix
 import GreedyAlgorithm
 
@@ -20,10 +22,10 @@ def average(
     return sum(array) / len(array)
 
 
-def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path: string = ''):
+def overall_time_testing(number_of_iterations, min_task_size, max_task_size, step=1, output_path: string = ''):
     save_to_file = False
     if min_task_size == -1:
-        min_task_size = 4
+        min_task_size = 5
     if max_task_size == -1:
         max_task_size = 14
     if step == -1:
@@ -32,7 +34,6 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         save_to_file = True
 
     gc.disable()
-    number_of_iterations = 15
     ants_per_edge = 1
     influence_data = 1
     influence_pheromone = 0.8
@@ -179,8 +180,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
                     data,
                     group_indices,
                     how_much_to_choose,
-                    max_samples_for_branch=2,
-                    start_level=1)
+                    max_samples_for_branch=3,
+                    start_level=0)
 
                 _, max_dict = bnb.data_dict_to_treedict_converter(tr_tree)
 
@@ -256,12 +257,12 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
             "Залежність часу виконання від розмірності")
         plt.xlabel("розмір групи")
         plt.ylabel("час роботи, с")
-        plt.show()
 
         if save_to_file:
             file_name = os.path.join(
-                output_path, "Залежність часу виконання від розмірності.png")
+                output_path, "timeFromSize.png")
             plt.savefig(file_name)
+        plt.show()
 
         fig2, ax2 = plt.subplots()
         ax2.plot(task_size, max_result_bnb_orig,
@@ -279,24 +280,25 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
 
         plt.ylim(0, 15)
 
-        plt.show()
-
         if save_to_file:
             file_name = os.path.join(
-                output_path, "Залежність точності від розмірності.png")
+                output_path, "precisionFromSize.png")
             plt.savefig(file_name)
+        plt.show()
 
     plot_data()
 
 
 def main():
+    iterations = -1
     min_task_size = -1
     max_task_size = -1
     step_size = -1
     output_path = ''
 
     opts, args = getopt.getopt(sys.argv[1:], "h",
-                               ["min_ts=",
+                               ["iter=",
+                                "min_ts=",
                                 "max_ts=",
                                 "step_size=",
                                 "output_path="])
@@ -308,12 +310,14 @@ def main():
                 ' [--max_ts=<max task size>] [--step_size=<step size>]'
                 ' [--output_path=<output path>]')
             sys.exit()
+        elif opt in "--iter=":
+            iterations = int(arg)
         elif opt in "--min_ts=":
             min_task_size = int(arg)
         elif opt in "--max_ts=":
             max_task_size = int(arg)
         elif opt in "--step_size=":
-            step_size = float(arg)
+            step_size = int(arg)
         elif opt in "--output_path=":
             output_path = arg
 
@@ -324,7 +328,8 @@ def main():
     if step_size == '':
         step_size = -1
 
-    overall_time_testing(min_task_size, max_task_size, step_size, output_path)
+    overall_time_testing(iterations, min_task_size,
+                         max_task_size, step_size, output_path)
 
 
 if __name__ == "__main__":

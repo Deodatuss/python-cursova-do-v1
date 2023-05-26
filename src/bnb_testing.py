@@ -10,12 +10,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import permutations
 
-import utilities, AntColony, branchAndBound as bnb
+import utilities
+import AntColony
+import branchAndBound as bnb
 from data_generator import generate_compatibility_matrix
+
 
 def average(
         array: list):
     return sum(array) / len(array)
+
 
 def bnb_mean_testing(
         task_size: int,
@@ -91,7 +95,8 @@ def bnb_mean_testing(
             execution_time_bnb_orig_iteration.append(end_time)
 
         max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
-        execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+        execution_time_bnb_orig.append(
+            average(execution_time_bnb_orig_iteration))
 
         max_result_bnb_modified_iteration = []
         execution_time_bnb_modified_iteration = []
@@ -123,9 +128,48 @@ def bnb_mean_testing(
             max_result_bnb_modified_iteration.append(current_max)
             execution_time_bnb_modified_iteration.append(end_time)
 
-        max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
-        execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
+        max_result_bnb_modified.append(
+            average(max_result_bnb_modified_iteration))
+        execution_time_bnb_modified.append(
+            average(execution_time_bnb_modified_iteration))
+
+    fig1, ax1 = plt.subplots()
+    ax1.plot(task_size, execution_time_bnb_orig,
+             "-b<", label="branching tree")
+    ax1.plot(task_size, execution_time_bnb_modified,
+             "-rh", label="modified br tree")
+    plt.legend(loc="upper left")
+    plt.title(
+        "Залежність часу виконання від мат сподівання")
+    plt.xlabel("параметр розподілу μ")
+    plt.ylabel("час роботи, с")
+
+    if save_to_file:
+        file_name = os.path.join(
+            output_path, "timeFromMean.png")
+        plt.savefig(file_name)
+    plt.show()
+
+    fig2, ax2 = plt.subplots()
+    ax2.plot(task_size, max_result_bnb_orig,
+             "-b>", label="branching tree")
+    ax2.plot(task_size, max_result_bnb_modified,
+             "-rh", label="modified br tree")
+    plt.legend(loc="upper left")
+    plt.title(
+        "Залежність точності від мат сподівання")
+    plt.xlabel("параметр розподілу μ")
+    plt.ylabel("загальна взаємопридатність, од")
+
+    plt.ylim(0, 15)
+
+    if save_to_file:
+        file_name = os.path.join(
+            output_path, "precisionFromMean.png")
+        plt.savefig(file_name)
+    plt.show()
     value_to_stop_debugger = 'hello'
+
 
 def bnb_dispersion_testing(
         task_size: int,
@@ -156,8 +200,8 @@ def bnb_dispersion_testing(
     max_result_bnb_orig = []
     execution_time_bnb_orig = []
 
-    execution_time_bnb_modified = []
     max_result_bnb_modified = []
+    execution_time_bnb_modified = []
 
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
@@ -202,7 +246,8 @@ def bnb_dispersion_testing(
             execution_time_bnb_orig_iteration.append(end_time)
 
         max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
-        execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+        execution_time_bnb_orig.append(
+            average(execution_time_bnb_orig_iteration))
 
         max_result_bnb_modified_iteration = []
         execution_time_bnb_modified_iteration = []
@@ -234,9 +279,48 @@ def bnb_dispersion_testing(
             max_result_bnb_modified_iteration.append(current_max)
             execution_time_bnb_modified_iteration.append(end_time)
 
-        max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
-        execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
+        max_result_bnb_modified.append(
+            average(max_result_bnb_modified_iteration))
+        execution_time_bnb_modified.append(
+            average(execution_time_bnb_modified_iteration))
+
+    fig1, ax1 = plt.subplots()
+    ax1.plot(task_size, execution_time_bnb_orig,
+             "-b<", label="branching tree")
+    ax1.plot(task_size, execution_time_bnb_modified,
+             "-rh", label="modified br tree")
+    plt.legend(loc="upper left")
+    plt.title(
+        "Залежність часу виконання від сер квад відхиленя")
+    plt.xlabel("параметр розподілу σ")
+    plt.ylabel("час роботи, с")
+
+    if save_to_file:
+        file_name = os.path.join(
+            output_path, "timeFromDeviation.png")
+        plt.savefig(file_name)
+    plt.show()
+
+    fig2, ax2 = plt.subplots()
+    ax2.plot(task_size, max_result_bnb_orig,
+             "-b>", label="branching tree")
+    ax2.plot(task_size, max_result_bnb_modified,
+             "-rh", label="modified br tree")
+    plt.legend(loc="upper left")
+    plt.title(
+        "Залежність точності від сер квад відхиленя")
+    plt.xlabel("параметр розподілу σ")
+    plt.ylabel("загальна взаємопридатність, од")
+
+    plt.ylim(0, 15)
+
+    if save_to_file:
+        file_name = os.path.join(
+            output_path, "precisionFromDeviation.png")
+        plt.savefig(file_name)
+    plt.show()
     stop_debugger_point = "stop me here"
+
 
 def main():
     task_size = -1
@@ -322,6 +406,7 @@ def main():
         dispersion_step,
         iterations,
         output_path)
+
 
 if __name__ == "__main__":
     main()
