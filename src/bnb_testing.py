@@ -23,7 +23,7 @@ def bnb_mean_testing(
         start_level,
         mean: float,
         mean_step: float,
-        iterations: int = 10,
+        iterations: int,
         output_path: string = ''):
     all_possible_choosings = [i for i in permutations([1, 2, 3], 3)]
 
@@ -51,8 +51,7 @@ def bnb_mean_testing(
 
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
-    kek = np.arange(mean, 0.9, mean_step)
-    for j in []:
+    for j in np.arange(mean, 0.9, mean_step):
         for i in range(iterations):
             data = generate_compatibility_matrix(
                 task_size,
@@ -63,7 +62,7 @@ def bnb_mean_testing(
 
             group_indices = utilities.get_group_indices(data)
 
-            print("reg bnb iteration ", i, " of ", task_size)
+            print("reg bnb iteration ", i+1, " of ", iterations)
 
             # gc.collect()
             start_time = time.process_time()
@@ -98,7 +97,7 @@ def bnb_mean_testing(
         execution_time_bnb_modified_iteration = []
         # gc.collect()
         for i in range(iterations):
-            print("bnb modified iteration ", i, " of ", task_size)
+            print("bnb modified iteration ", i+1, " of ", iterations)
             start_time = time.process_time()
 
             current_max = -1
@@ -134,7 +133,7 @@ def bnb_dispersion_testing(
         start_level,
         dispersion: float,
         dispersion_step: float,
-        iterations: int = 10,
+        iterations: int,
         output_path: string = ''):
     all_possible_choosings = [i for i in permutations([1, 2, 3], 3)]
 
@@ -174,7 +173,7 @@ def bnb_dispersion_testing(
 
             group_indices = utilities.get_group_indices(data)
 
-            print("reg bnb iteration ", i, " of ", task_size)
+            print("reg bnb iteration ", i+1, " of ",  iterations)
 
             # gc.collect()
             start_time = time.process_time()
@@ -209,7 +208,7 @@ def bnb_dispersion_testing(
         execution_time_bnb_modified_iteration = []
         # gc.collect()
         for i in range(iterations):
-            print("bnb modified iteration ", i, " of ", task_size)
+            print("bnb modified iteration ", i+1, " of ", iterations)
             start_time = time.process_time()
 
             current_max = -1
@@ -270,24 +269,24 @@ def main():
                 ' [--dispersion_step=<dispersion step>] [--iterations=<iterations>]'
                 ' [--output_path=<output_path>]')
             sys.exit()
-        elif opt in "max_sfb=":
+        elif opt in "--max_sfb=":
             max_samples_for_branch = int(arg)
-        elif opt in "task_size=":
+        elif opt in "--task_size=":
             task_size = int(arg)
-        elif opt in "start_level=":
+        elif opt in "--start_level=":
             start_level = int(arg)
-        elif opt in "mean=":
-            mean = int(arg)
-        elif opt in "mean_step=":
-            mean_step = int(arg)
-        elif opt in "dispersion=":
-            dispersion = int(arg)
-        elif opt in "dispersion_step=":
-            dispersion_step = int(arg)
-        elif opt in "iterations=":
+        elif opt in "--mean=":
+            mean = float(arg)
+        elif opt in "--mean_step=":
+            mean_step = float(arg)
+        elif opt in "--dispersion=":
+            dispersion = float(arg)
+        elif opt in "--dispersion_step=":
+            dispersion_step = float(arg)
+        elif opt in "--iterations=":
             iterations = int(arg)
-        elif opt in "output_path=":
-            output_path = int(arg)
+        elif opt in "--output_path=":
+            output_path = arg
 
     if max_samples_for_branch == '':
         max_samples_for_branch = -1

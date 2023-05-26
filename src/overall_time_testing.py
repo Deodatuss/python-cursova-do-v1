@@ -12,6 +12,7 @@ from itertools import permutations
 
 import utilities, AntColony, branchAndBound as bnb
 from data_generator import generate_compatibility_matrix
+import GreedyAlgorithm
 
 
 def average(
@@ -45,8 +46,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
     all_possible_choosings = [i for i in permutations([1, 2, 3], 3)]
 
     task_size = []
-    for i in range(min_task_size, max_task_size, step):
-        task_size.append(i)
+    for i in np.arange(min_task_size, max_task_size, step):
+        task_size.append(round(i))
 
     execution_time_bnb_orig = []
     max_result_bnb_orig = []
@@ -307,14 +308,14 @@ def main():
                 ' [--max_ts=<max task size>] [--step_size=<step size>]'
                 ' [--output_path=<output path>]')
             sys.exit()
-        elif opt in "min_ts=":
-            min_task_size = arg
-        elif opt in "max_ts=":
-            max_task_size = arg
-        elif opt in "step_size=":
-            step_size = int(arg)
-        elif opt in "output_path=":
-            output_path = int(arg)
+        elif opt in "--min_ts=":
+            min_task_size = int(arg)
+        elif opt in "--max_ts=":
+            max_task_size = int(arg)
+        elif opt in "--step_size=":
+            step_size = float(arg)
+        elif opt in "--output_path=":
+            output_path = arg
 
     if min_task_size == '':
         min_task_size = -1
