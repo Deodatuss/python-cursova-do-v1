@@ -10,7 +10,111 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "args": [
+                "ab:c:"
+            ]
+        },
+        {
+            "name": "Python: BnBDemo.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/BnBDemo.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--input_file=data\\demo\\importData.csv",
+                "--output_path=data\\demo\\output",
+                "--a=2",
+                "--b=3",
+                "--c=1",
+                "--max_samples_for_branch=3",
+                "--start_level=0"
+            ]
+        },
+        {
+            "name": "Python: AntColonyDemo.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/AntColonyDemo.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--input_file=data\\demo\\input.json",
+                "--output_path=data\\demo\\ants",
+                "--a=2",
+                "--b=3",
+                "--c=1",
+                "--id=1.0",
+                "--iph=0.8",
+                "--noi=15",
+                "--ape=1",
+                "--ecoef=0.2",
+                "--ssp=1000"
+            ]
+        },
+        {
+            "name": "Python: ant_colony_testing.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/ant_colony_testing.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--iter=10",
+                "--ts=15",
+                "--api=-1",
+                "--bdi=0.5",
+                "--pec=0.5",
+                "--gni=1",
+                "--tnav=5",
+                "--output_path=data\\experiments\\ants",
+            ]
+        },
+        {
+            "name": "Python: bnb_testing.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/bnb_testing.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--max_sfb=3",
+                "--task_size=6",
+                "--start_level=0",
+                "--mean=0.8",
+                "--mean_step=0.1",
+                "--dispersion=0.5",
+                "--dispersion_step=1",
+                "--iterations=5",
+                "--output_path=data\\experiments\\branching"
+            ]
+        },
+        {
+            "name": "Python: overall_time_testing.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/overall_time_testing.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--iter=2",
+                "--min_ts=5",
+                "--max_ts=8",
+                "--step_size=1",
+                "--output_path=data\\experiments\\all"
+            ]
+        },
+        {
+            "name": "Python: minitest.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/minitest.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--api=data\\demo\\importData.csv"
+            ]
         }
     ]
 }
