@@ -57,6 +57,9 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
     execution_time_bnb_modified = []
     max_result_bnb_modified = []
 
+    execution_time_greedy = []
+    max_result_greedy = []
+
     mean = 0.5
     dispersion = 0.25
 
@@ -68,7 +71,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         max_result_bnb_orig_iteration = []
         execution_time_bnb_orig_iteration = []
         for i in range(10):
-            data = generate_compatibility_matrix(size, size, size, 'normalvariate', mean, dispersion)
+            data = generate_compatibility_matrix(
+                size, size, size, 'normalvariate', mean, dispersion)
 
             group_indices = utilities.get_group_indices(data)
 
@@ -101,7 +105,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
             execution_time_bnb_orig_iteration.append(end_time)
 
         max_result_bnb_orig.append(average(max_result_bnb_orig_iteration))
-        execution_time_bnb_orig.append(average(execution_time_bnb_orig_iteration))
+        execution_time_bnb_orig.append(
+            average(execution_time_bnb_orig_iteration))
 
         # ant colony
         #
@@ -159,7 +164,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         execution_time_bnb_modified_iteration = []
         # gc.collect()
         for i in range(10):
-            print("bnb modified iteration ", size, ".", i, " of ", max_task_size)
+            print("bnb modified iteration ", size,
+                  ".", i, " of ", max_task_size)
             start_time = time.process_time()
 
             current_max = -1
@@ -185,8 +191,41 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
             max_result_bnb_modified_iteration.append(current_max)
             execution_time_bnb_modified_iteration.append(end_time)
 
-        max_result_bnb_modified.append(average(max_result_bnb_modified_iteration))
-        execution_time_bnb_modified.append(average(execution_time_bnb_modified_iteration))
+        max_result_bnb_modified.append(
+            average(max_result_bnb_modified_iteration))
+        execution_time_bnb_modified.append(
+            average(execution_time_bnb_modified_iteration))
+
+        # bnb modified
+        #
+        max_result_greedy_iteration = []
+        execution_time_greedy_iteration = []
+        # gc.collect()
+        for i in range(10):
+            print("greedy iteration ", size, ".", i, " of ", max_task_size)
+            start_time = time.process_time()
+
+            current_max = -1
+            for i in all_possible_choosings:
+                how_much_to_choose = {
+                    'a': i[0], 'b': i[1], 'c': i[2]
+                }
+
+                value = GreedyAlgorithm.greedy_value(
+                    data,
+                    group_indices,
+                    how_much_to_choose)
+
+                if current_max < value:
+                    current_max = value
+            end_time = time.process_time() - start_time
+
+            max_result_greedy_iteration.append(current_max)
+            execution_time_greedy_iteration.append(end_time)
+        max_result_greedy.append(
+            average(max_result_greedy_iteration))
+        execution_time_greedy.append(
+            average(execution_time_greedy_iteration))
 
         gc.enable()
 
@@ -199,6 +238,9 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
     print(execution_time_bnb_modified)
     print(max_result_bnb_modified)
 
+    print(execution_time_greedy)
+    print(max_result_greedy)
+
     def plot_data():
         fig1, ax1 = plt.subplots()
         ax1.plot(task_size, execution_time_bnb_orig,
@@ -206,6 +248,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         ax1.plot(task_size, execution_time_ant, "-g>", label="ant colony")
         ax1.plot(task_size, execution_time_bnb_modified,
                  "-rh", label="modified br tree")
+        ax1.plot(task_size, execution_time_greedy,
+                 "-yd", label="greedy")
         plt.legend(loc="upper left")
         plt.title(
             "Залежність часу виконання від розмірності")
@@ -214,7 +258,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         plt.show()
 
         if save_to_file:
-            file_name = os.path.join(output_path, "Залежність часу виконання від розмірності.png")
+            file_name = os.path.join(
+                output_path, "Залежність часу виконання від розмірності.png")
             plt.savefig(file_name)
 
         fig2, ax2 = plt.subplots()
@@ -223,6 +268,8 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         ax2.plot(task_size, max_result_ant, "-g<", label="ant colony")
         ax2.plot(task_size, max_result_bnb_modified,
                  "-rh", label="modified br tree")
+        ax2.plot(task_size, max_result_greedy,
+                 "-yd", label="greedy")
         plt.legend(loc="upper left")
         plt.title(
             "Залежність точності від розмірності")
@@ -234,10 +281,12 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
         plt.show()
 
         if save_to_file:
-            file_name = os.path.join(output_path, "Залежність точності від розмірності.png")
+            file_name = os.path.join(
+                output_path, "Залежність точності від розмірності.png")
             plt.savefig(file_name)
 
     plot_data()
+
 
 def main():
     min_task_size = ''
@@ -274,6 +323,7 @@ def main():
         step_size = -1
 
     overall_time_testing(min_task_size, max_task_size, step_size, output_path)
+
 
 if __name__ == "__main__":
     main()
