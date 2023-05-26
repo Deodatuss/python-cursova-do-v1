@@ -12,6 +12,7 @@ from itertools import permutations
 
 import utilities, AntColony, branchAndBound as bnb
 from data_generator import generate_compatibility_matrix
+import GreedyAlgorithm
 
 
 def average(
