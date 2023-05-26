@@ -24,10 +24,12 @@ def ant_colony_testing(
     beta_data_influence=-1,
     p_evaporation_coeficient=-1,
     gamma_number_of_iterations=-1,
-    theta_number_of_ants_per_vertice=-1
+    theta_number_of_ants_per_vertice=-1,
+    iterations: int = 10,
+    task_size: int = 8
 ):
-    size = 10
-    variants = 10
+    size = task_size
+    variants = iterations
 
     concat_params = [
         alfa_pheromone_influence,
@@ -343,7 +345,7 @@ def main():
     # ant_colony_testing(0.8, 0.1, -1, 10, 1)
     # ant_colony_testing(0.8, 0.1, 0.3, -1, 1)
     # ant_colony_testing(0.8, 0.1, 0.3, 10, -1)
-    ant_colony_testing(-1, -1, -1, -1, -1)
+    ant_colony_testing(-1, -1, -1, -1, -1, 10, 8)
 
 
 if __name__ == "__main__":
