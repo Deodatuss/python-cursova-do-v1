@@ -10,8 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import permutations
 
-from src import utilities, AntColony, branchAndBound as bnb
-from src.data_generator import generate_compatibility_matrix
+import utilities, AntColony, branchAndBound as bnb
+from data_generator import generate_compatibility_matrix
 
 
 def average(
@@ -289,9 +289,9 @@ def overall_time_testing(min_task_size=4, max_task_size=14, step=1, output_path:
 
 
 def main():
-    min_task_size = ''
-    max_task_size = ''
-    step_size = ''
+    min_task_size = -1
+    max_task_size = -1
+    step_size = -1
     output_path = ''
 
     opts, args = getopt.getopt(sys.argv[1:], "h",
@@ -303,8 +303,9 @@ def main():
     for opt, arg in opts:
         if opt == '-h':
             print(
-                'python overall_time_testing.py [--mit_ts=<min task size>]'
-                ' [--max_ts=<max task size>] [--step_size=<step size>]')
+                'python overall_time_testing.py [--min_ts=<min task size>]'
+                ' [--max_ts=<max task size>] [--step_size=<step size>]'
+                ' [--output_path=<output path>]')
             sys.exit()
         elif opt in "min_ts=":
             min_task_size = arg

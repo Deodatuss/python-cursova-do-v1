@@ -10,8 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import permutations
 
-from src import utilities, AntColony, branchAndBound as bnb
-from src.data_generator import generate_compatibility_matrix
+import utilities, AntColony, branchAndBound as bnb
+from data_generator import generate_compatibility_matrix
 
 def average(
         array: list):
@@ -51,8 +51,8 @@ def bnb_mean_testing(
 
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
-
-    for j in range(mean, 0.9, mean_step):
+    kek = np.arange(mean, 0.9, mean_step)
+    for j in []:
         for i in range(iterations):
             data = generate_compatibility_matrix(
                 task_size,
@@ -163,7 +163,7 @@ def bnb_dispersion_testing(
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
 
-    for j in range(dispersion, 5, dispersion_step):
+    for j in np.arange(dispersion, 5, dispersion_step):
         for i in range(iterations):
             data = generate_compatibility_matrix(
                 task_size,
@@ -240,14 +240,14 @@ def bnb_dispersion_testing(
     stop_debugger_point = "stop me here"
 
 def main():
-    task_size = '',
-    max_samples_for_branch = '',
-    start_level = '',
-    mean = '',
-    mean_step = '',
-    dispersion = '',
-    dispersion_step = '',
-    iterations = ''
+    task_size = -1
+    max_samples_for_branch = -1
+    start_level = -1
+    mean = -1
+    mean_step = -1
+    dispersion = -1
+    dispersion_step = -1
+    iterations = -1
     output_path = ''
 
     opts, args = getopt.getopt(sys.argv[1:], "h",
@@ -271,15 +271,15 @@ def main():
                 ' [--output_path=<output_path>]')
             sys.exit()
         elif opt in "max_sfb=":
-            max_samples_for_branch = arg
+            max_samples_for_branch = int(arg)
         elif opt in "task_size=":
-            task_size = arg
+            task_size = int(arg)
         elif opt in "start_level=":
             start_level = int(arg)
         elif opt in "mean=":
             mean = int(arg)
         elif opt in "mean_step=":
-            mean_step = arg
+            mean_step = int(arg)
         elif opt in "dispersion=":
             dispersion = int(arg)
         elif opt in "dispersion_step=":

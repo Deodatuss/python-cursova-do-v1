@@ -1,5 +1,5 @@
 import numpy as np
-from src.branchAndBound import bound_from_string
+from branchAndBound import bound_from_string
 
 
 def probability_of_all_paths(array_data, array_pheromone, influence_data, influence_pheromone, paths: dict):
