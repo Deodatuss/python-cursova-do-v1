@@ -247,7 +247,7 @@ def bnb_mean_testing(
                 task_size,
                 task_size,
                 task_size,
-                mean=mean,
+                mean=j,
                 dispersion=1)
 
             group_indices = utilities.get_group_indices(data)
@@ -342,7 +342,7 @@ def bnb_dispersion_testing(
                 task_size,
                 task_size,
                 mean=0.5,
-                dispersion=dispersion)
+                dispersion=j)
 
             group_indices = utilities.get_group_indices(data)
 
