@@ -1,6 +1,5 @@
 import converters
 import utilities
-
 import itertools
 import numpy as np
 

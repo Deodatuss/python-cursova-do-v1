@@ -1,6 +1,6 @@
-import utilities
-import numpy as np
 import itertools
+
+import numpy as np
 
 
 def unique_three_max(array_data, indices, choose_from_groups):
