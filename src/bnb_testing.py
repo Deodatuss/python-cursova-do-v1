@@ -55,7 +55,10 @@ def bnb_mean_testing(
 
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
+
+    x_axis = []
     for j in np.arange(mean, 0.9, mean_step):
+        x_axis.append(j)
         for i in range(iterations):
             data = generate_compatibility_matrix(
                 task_size,
@@ -134,9 +137,9 @@ def bnb_mean_testing(
             average(execution_time_bnb_modified_iteration))
 
     fig1, ax1 = plt.subplots()
-    ax1.plot(task_size, execution_time_bnb_orig,
+    ax1.plot(x_axis, execution_time_bnb_orig,
              "-b<", label="branching tree")
-    ax1.plot(task_size, execution_time_bnb_modified,
+    ax1.plot(x_axis, execution_time_bnb_modified,
              "-rh", label="modified br tree")
     plt.legend(loc="upper left")
     plt.title(
@@ -151,9 +154,9 @@ def bnb_mean_testing(
     plt.show()
 
     fig2, ax2 = plt.subplots()
-    ax2.plot(task_size, max_result_bnb_orig,
+    ax2.plot(x_axis, max_result_bnb_orig,
              "-b>", label="branching tree")
-    ax2.plot(task_size, max_result_bnb_modified,
+    ax2.plot(x_axis, max_result_bnb_modified,
              "-rh", label="modified br tree")
     plt.legend(loc="upper left")
     plt.title(
@@ -206,7 +209,9 @@ def bnb_dispersion_testing(
     max_result_bnb_orig_iteration = []
     execution_time_bnb_orig_iteration = []
 
+    x_axis = []
     for j in np.arange(dispersion, 5, dispersion_step):
+        x_axis.append(j)
         for i in range(iterations):
             data = generate_compatibility_matrix(
                 task_size,
@@ -285,9 +290,9 @@ def bnb_dispersion_testing(
             average(execution_time_bnb_modified_iteration))
 
     fig1, ax1 = plt.subplots()
-    ax1.plot(task_size, execution_time_bnb_orig,
+    ax1.plot(x_axis, execution_time_bnb_orig,
              "-b<", label="branching tree")
-    ax1.plot(task_size, execution_time_bnb_modified,
+    ax1.plot(x_axis, execution_time_bnb_modified,
              "-rh", label="modified br tree")
     plt.legend(loc="upper left")
     plt.title(
@@ -302,9 +307,9 @@ def bnb_dispersion_testing(
     plt.show()
 
     fig2, ax2 = plt.subplots()
-    ax2.plot(task_size, max_result_bnb_orig,
+    ax2.plot(x_axis, max_result_bnb_orig,
              "-b>", label="branching tree")
-    ax2.plot(task_size, max_result_bnb_modified,
+    ax2.plot(x_axis, max_result_bnb_modified,
              "-rh", label="modified br tree")
     plt.legend(loc="upper left")
     plt.title(

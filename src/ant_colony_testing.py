@@ -70,15 +70,15 @@ def ant_colony_testing(
         alfa_testing_data = [x for x in np.arange(0.1, 2, 0.1)]
 
     if beta_data_influence == -1:
-        beta_data_influence = 1.0
+        beta_data_influence = 1.5
         beta_testing_data = [x for x in np.arange(0.1, 2, 0.1)]
 
     if p_evaporation_coeficient == -1:
-        p_evaporation_coeficient = 0.2
+        p_evaporation_coeficient = 0.3
         p_testing_data = [x for x in np.arange(0.1, 1, 0.1)]
 
     if gamma_number_of_iterations == -1:
-        gamma_number_of_iterations = 15
+        gamma_number_of_iterations = 20
         gamma_testing_data = [x for x in np.arange(1, 20, 1)]
 
     if theta_number_of_ants_per_vertice == -1:
@@ -96,7 +96,7 @@ def ant_colony_testing(
             "Залежність точності від параметру мурашиного алгоритму")
         plt.xlabel(x_axis[1])
         plt.ylabel("загальна взаємопридатність, од")
-        plt.ylim(4, 15)
+        # plt.ylim(10, 25)
 
     for param, flag in is_given_by_user_flags.items():
         if param == "alfa" and not flag:
@@ -117,7 +117,8 @@ def ant_colony_testing(
                               ", iteration = ", i,  ", variant=", k)
                         for choo in all_possible_choosings:
                             group_indices = utilities.get_group_indices(data)
-                            pheromone = np.ones(data.shape)
+                            pheromone = np.random.rand(
+                                data.shape[0], data.shape[1])
                             how_much_to_choose = {
                                 'a': choo[0], 'b': choo[1], 'c': choo[2]
                             }
@@ -166,7 +167,8 @@ def ant_colony_testing(
                               ", iteration = ", i,  ", variant=", k)
                         for choo in all_possible_choosings:
                             group_indices = utilities.get_group_indices(data)
-                            pheromone = np.ones(data.shape)
+                            pheromone = np.random.rand(
+                                data.shape[0], data.shape[1])
                             how_much_to_choose = {
                                 'a': choo[0], 'b': choo[1], 'c': choo[2]
                             }
@@ -214,7 +216,8 @@ def ant_colony_testing(
                               ", iteration = ", i,  ", variant=", k)
                         for choo in all_possible_choosings:
                             group_indices = utilities.get_group_indices(data)
-                            pheromone = np.ones(data.shape)
+                            pheromone = np.random.rand(
+                                data.shape[0], data.shape[1])
                             how_much_to_choose = {
                                 'a': choo[0], 'b': choo[1], 'c': choo[2]
                             }
@@ -263,7 +266,8 @@ def ant_colony_testing(
                               jjjj, ", variant=", k)
                         for choo in all_possible_choosings:
                             group_indices = utilities.get_group_indices(data)
-                            pheromone = np.ones(data.shape)
+                            pheromone = np.random.rand(
+                                data.shape[0], data.shape[1])
                             how_much_to_choose = {
                                 'a': choo[0], 'b': choo[1], 'c': choo[2]
                             }
@@ -310,7 +314,8 @@ def ant_colony_testing(
                         print("theta$ x value = ", jjjj, ", iteration = ", i)
                         for choo in all_possible_choosings:
                             group_indices = utilities.get_group_indices(data)
-                            pheromone = np.ones(data.shape)
+                            pheromone = np.random.rand(
+                                data.shape[0], data.shape[1])
                             how_much_to_choose = {
                                 'a': choo[0], 'b': choo[1], 'c': choo[2]
                             }
