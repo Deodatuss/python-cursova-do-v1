@@ -212,13 +212,13 @@ def bnb_dispersion_testing(
     x_axis = []
     for j in np.arange(dispersion, 5, dispersion_step):
         x_axis.append(j)
+        data = generate_compatibility_matrix(
+            task_size,
+            task_size,
+            task_size,
+            mean=0.5,
+            dispersion=j)
         for i in range(iterations):
-            data = generate_compatibility_matrix(
-                task_size,
-                task_size,
-                task_size,
-                mean=0.5,
-                dispersion=j)
 
             group_indices = utilities.get_group_indices(data)
 
@@ -394,14 +394,14 @@ def main():
     if iterations == '':
         iterations = -1
 
-    bnb_mean_testing(
-        task_size,
-        max_samples_for_branch,
-        start_level,
-        mean,
-        mean_step,
-        iterations,
-        output_path)
+    # bnb_mean_testing(
+    #     task_size,
+    #     max_samples_for_branch,
+    #     start_level,
+    #     mean,
+    #     mean_step,
+    #     iterations,
+    #     output_path)
 
     bnb_dispersion_testing(
         task_size,
